@@ -67,8 +67,8 @@ Now, we can add the Three.js library to our `index.html` file. We will add it to
  <!DOCTYPE html>
  <html>
  <head>
-     <title>Three JS Molecules</title>
-+     <script src="js/three.min.js"></script> 
+    <title>Three JS Molecules</title>
++   <script src="js/three.min.js"></script> 
  </head>
  <body>
      
