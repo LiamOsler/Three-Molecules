@@ -64,16 +64,16 @@ so we have something like this to get started from:
 Now, we can add the Three.js library to our `index.html` file. We will add it to the `<head>` section of the file, and we will add it as a `<script>` tag. We will also add a `<script>` tag to load our own JavaScript file, which we will call `main.js`.
 
 ```diff
- <!DOCTYPE html>
- <html>
- <head>
-    <title>Three JS Molecules</title>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Three JS Molecules</title>
 +   <script src="js/three.min.js"></script> 
- </head>
- <body>
-     
- </body>
- </html>
+</head>
+<body>
+    
+</body>
+</html>
 ```
 
 
