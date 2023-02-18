@@ -32,4 +32,48 @@ If you don't have Node.js installed, you can use the `python -m SimpleHTTPServer
 
 You can also use something like a [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for Visual Studio Code.
 
+## Step 1: Import Three.js
+
+Start by setting up a basic file structure and importing version `r150` of the Three.js library. Note: you can also install the ES6 module version of Three.js using `npm install three` and this method is recommended for more complex projects. But for this simple example, we will use the minified version of the older version of the library.
+
+First, make a file called `index.html` and add the following code:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Three JS Molecules</title>
+</head>
+<body>
+    
+</body>
+</html>
+```
+
+Then, you need to download the Three.js library. You can download the minified version from the [Three.js Github Repository](https://raw.githubusercontent.com/mrdoob/three.js/dev/build/three.min.js) and save it in a folder called `js` in the root of your project directory,
+so we have something like this to get started from:
+
+```bash
+.
+├── index.html
+├── js
+│   └── three.min.js
+└── README.md
+```
+
+Now, we can add the Three.js library to our `index.html` file. We will add it to the `<head>` section of the file, and we will add it as a `<script>` tag. We will also add a `<script>` tag to load our own JavaScript file, which we will call `main.js`.
+
+```diff
+ <!DOCTYPE html>
+ <html>
+ <head>
+     <title>Three JS Molecules</title>
++     <script src="js/three.min.js"></script> 
+ </head>
+ <body>
+     
+ </body>
+ </html>
+```
+
 
