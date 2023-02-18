@@ -180,4 +180,5 @@ Put everything together, and your code will look like this:
 </body>
 </html>
 ```
-If everything is working correctly, you should see a green cube in the center of the browser window.
+
+You should see a green cube in the center of the browser window.
