@@ -31,5 +31,3 @@ If you have Node.js installed, you can use the [`http-server`](https://www.npmjs
 If you don't have Node.js installed, you can use the `python -m SimpleHTTPServer` command to run a web server instead.
 
 You can also use something like a [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for Visual Studio Code.
-
-
