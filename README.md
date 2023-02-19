@@ -253,7 +253,7 @@ function init(){
 }
 ```
 
-We can refactor the init function to use a parameter which defines the ID of the molfile to load:
+We can refactor the `init()` function to use a parameter which defines the ID of the molfile to load:
 
 ```js
 const scene = new THREE.Scene();
@@ -394,7 +394,7 @@ Next, we want to retrieve the bonds. A line describing a single bond looks like 
 ```text
   1  9  2  0  0  0  0
 ```
-This is a connection table. The first two columns contain the index of the atoms that are connected by the bond (the order in which they appeared in the file). The third column contains the bond type. Thus it is crucial to keep the order of the atoms in the molObj's atom array in the same order as the order in which they appear in the file. One should note that **molfiles have a starting index of 1**.
+This is a connection table. The first two columns contain the index of the atoms that are connected by the bond (the order in which they appeared in the file). The third column contains the bond type. Thus it is crucial to keep the order of the atoms in the molObj's atom array in the same order as the order in which they appear in the file. One should note that **`.mol` files have a starting index of 1**.
 
 We can retrieve the bonds by iterating over the lines starting from the 5 + `molObj.counts.molecules` line and finishing at line 5 + `molObj.counts.molecules` + `molObj.counts.bonds`, and write them in a 2D array as `molObj.bonds`:
 
@@ -407,6 +407,7 @@ for (let i = 4+parseInt(molObj.counts.molecules); i < 4 +parseInt(molObj.counts.
 molObj.bonds = bondsArray;
 ```
 
+With the addition of objects to represent the header of the `.mol` file, the code looks like this:
 
 ```js
 
