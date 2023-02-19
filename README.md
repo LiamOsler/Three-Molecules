@@ -285,3 +285,140 @@ animate();
 This will log the mol file to the console. In order to understand the mol file format, articles [like this](https://chem.libretexts.org/Courses/University_of_Arkansas_Little_Rock/ChemInformatics_(2017)%3A_Chem_4399_5399/2.2%3A_Chemical_Representations_on_Computer%3A_Part_II/2.2.2%3A_Anatomy_of_a_MOL_file) are very useful as well as the [Wikipedia article on chemical table file formats](https://en.wikipedia.org/wiki/Chemical_table_file#:~:text=An%20MDL%20Molfile%20is%20a,sections%20for%20more%20complex%20information.).
 
 
+## Step 4: Parsing a mol file
+
+Let's break down the basic contents of the 2424.mol file:
+
+The first three lines of a mol file contain information about the file itself, including a name (first line), information about the program that created the file (second line), and a third line that may contain a comment (and is sometimes used to store dates). The contents of these lines vary depending on the program used for their creation and there is a degree of inconsistency in the way that they are used.
+
+```bash
+2519
+  Marvin  12300703363D          
+
+```
+
+Next, the fourth line contains information about the number of atoms and bonds in the molecule:
+
+```bash
+ 24 25  0  0  0  0            999 V2000
+```
+
+Here it becomes important to note that mol files are arranged in a fixed-width format, with each line containing a fixed number of characters. The first three characters of each line contain the number of atoms in the molecule, the next three characters contain the number of bonds, and the next six characters contain the number of charges, the number of isotopes, the number of stereo centers, the number of stereo bonds, and the number of unknown properties, respectively. The next six characters are reserved for future use, and the last three characters are used to indicate the version of the mol file format (in the case of the caffeine mol file retrieved from Chemspider, this is V2000).
+
+The first two numbers are what we are particularly interested in, as they are going to help with parsing the rest of the file, as each atom receives its own line after the fourth line, and the bonds are listed after the atoms.
+
+We can start by creating a function that parses the content of the mol file that will return a JSON object containing the information we want about the atoms and bonds in the molecule:
+
+```js
+function molFileToJSON(molFile){
+    let molObj = {};
+    return molObj;
+}
+```
+
+We can then split the string in to an array of lines:
+
+```js
+function molFileToJSON(molFile){
+    let molObj = {};
+
+    const split = molFile.split('\n');
+
+    return molObj;
+}
+```
+
+We can then get the counts by chunking the line of the array:
+```js
+function molFileToJSON(molFile){
+    let molObj = {};
+
+    const split = molFile.split('\n');
+
+    const countChunks = [];
+    for (let i = 0; i < split[3].length; i+=3) {
+        countChunks.push(split[3].slice(i, i+3));
+    }
+
+    return molObj;
+}
+```
+
+Since mol files don't use padding on their number we then need to trim their the whitespace from the chunks before assigning them in the molObj:
+
+```js
+function molFileToJSON(molFile){
+    let molObj = {};
+
+    const split = molFile.split('\n');
+
+    const countChunks = [];
+    for (let i = 0; i < split[3].length; i+=3) {
+        countChunks.push(split[3].slice(i, i+3));
+    }
+
+    molObj.counts.molecules = countChunks[0].trim();
+    molObj.counts.bonds = countChunks[1].trim();
+    molObj.counts.lists = countChunks[2].trim();
+    molObj.counts.chiral = countChunks[4].trim() == 1 ? true : false;
+    molObj.counts.stext = countChunks[5];
+
+    return molObj;
+}
+```
+
+Once we have count for `molObj.counts.molecules` and `molObj.counts.bonds` we can then use them to parse the atoms and bonds in the file. In 2425.mol, since there are 24 atoms and 25 bonds, the atoms are listed from line 5 to line 28, and the bonds are listed from line 29 to line 53. A line describing a single atom looks like this:
+```text
+    0.2334   -2.4028    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+```
+
+We can start by creating an array to store each of the atoms.
+
+```js
+
+const molFileToJSON = (molFile) => {
+    let molObj = {};
+    const split = molFile.split('\n');
+    
+    molObj.header = {};
+    molObj.header.title = split[0];
+    molObj.header.program = split[1].split('  ')[1];
+    molObj.header.timeStamp = split[1].split('  ')[2];
+    molObj.header.comment = split[2];
+
+    molObj.counts = {};
+    
+    const countChunks = [];
+    for (let i = 0; i < split[3].length; i+=3) {
+        countChunks.push(split[3].slice(i, i+3));
+    }
+
+    molObj.counts.molecules = countChunks[0].trim();
+    molObj.counts.bonds = countChunks[1].trim();
+    molObj.counts.lists = countChunks[2].trim();
+    molObj.counts.chiral = countChunks[4].trim() == 1 ? true : false;
+    molObj.counts.stext = countChunks[5];
+
+    const atomsArray = [];
+    for (let i = 4; i < 4 + parseInt(molObj.counts.molecules); i++) {
+        const atom = {};
+        atom.position = {};
+        atom.position.x = split[i].slice(0, 10).trim();
+        atom.position.y = split[i].slice(10, 20).trim();
+        atom.position.z = split[i].slice(20, 30).trim();
+        atom.type = split[i].slice(31, 33).trim();
+        atomsArray.push(atom);
+    }
+    molObj.atoms = atomsArray;
+
+    const bondsArray = [];
+    for (let i = 4+parseInt(molObj.counts.molecules); i < 4 +parseInt(molObj.counts.molecules)+ parseInt(molObj.counts.bonds); i++) {
+        const bond = [split[i].slice(0, 3).trim(), split[i].slice(3, 6).trim()];
+        bondsArray.push(bond)
+    }
+    molObj.bonds = bondsArray;
+
+
+    return molObj;
+}
+```
