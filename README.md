@@ -371,8 +371,42 @@ Once we have count for `molObj.counts.molecules` and `molObj.counts.bonds` we ca
 ```text
     0.2334   -2.4028    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
 ```
+The X, Y, and Z columns contain the coordinates of the atom, the next column contains the element symbol. The X, Y, and Z coordinates are in the format #####.####, five digits for the integer part and four digits for the decimal part, so columns 1-10 contain the X coordinate, columns 11-20 contain the Y coordinate, and columns 21-30 contain the Z coordinate. The next column contains the Molecule's symbol (i.e. O for Oxygen, Na for Sodium, etc.).
 
-We can start by creating an array to store each of the atoms.
+We can parse each of the atoms by iterating over the lines starting from the fifth line and finishing at line 5 + `molObj.counts.molecules`:
+
+```js
+const atomsArray = [];
+for (let i = 4; i < 4 + parseInt(molObj.counts.molecules); i++) {
+    const atom = {};
+    atom.position = {};
+    atom.position.x = split[i].slice(0, 10).trim();
+    atom.position.y = split[i].slice(10, 20).trim();
+    atom.position.z = split[i].slice(20, 30).trim();
+    atom.type = split[i].slice(31, 33).trim();
+    atomsArray.push(atom);
+}
+molObj.atoms = atomsArray;
+```
+I like to use the format `position: {x,y,z}` to store the positions, as it matches the syntax used in the Three.js library. Thus you can access the X coordinate of the first atom in the molecule by using `molObj.atoms[0].position.x` and it's type (element symbol, i.e. O for Oxygen, Na for Sodium) by using `molObj.atoms[0].type`.
+
+Next, we want to retrieve the bonds. A line describing a single bond looks like this:
+```text
+  1  9  2  0  0  0  0
+```
+This is a connection table. The first two columns contain the index of the atoms that are connected by the bond (the order in which they appeared in the file). The third column contains the bond type. Thus it is crucial to keep the order of the atoms in the molObj's atom array in the same order as the order in which they appear in the file. One should note that **molfiles have a starting index of 1**.
+
+We can retrieve the bonds by iterating over the lines starting from the 5 + `molObj.counts.molecules` line and finishing at line 5 + `molObj.counts.molecules` + `molObj.counts.bonds`, and write them in a 2D array as `molObj.bonds`:
+
+```js
+const bondsArray = [];
+for (let i = 4+parseInt(molObj.counts.molecules); i < 4 +parseInt(molObj.counts.molecules)+ parseInt(molObj.counts.bonds); i++) {
+    const bond = [split[i].slice(0, 3).trim(), split[i].slice(3, 6).trim(), split[i].slice(6, 9).trim()];
+    bondsArray.push(bond)
+}
+molObj.bonds = bondsArray;
+```
+
 
 ```js
 
@@ -389,7 +423,7 @@ const molFileToJSON = (molFile) => {
     molObj.counts = {};
     
     const countChunks = [];
-    for (let i = 0; i < split[3].length; i+=3) {
+    for (let i = 0; i < split[3].length; i += 3) {
         countChunks.push(split[3].slice(i, i+3));
     }
 
