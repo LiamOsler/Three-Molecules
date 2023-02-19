@@ -410,7 +410,6 @@ molObj.bonds = bondsArray;
 With the addition of objects to represent the header of the `.mol` file, the code looks like this:
 
 ```js
-
 const molFileToJSON = (molFile) => {
     let molObj = {};
     const split = molFile.split('\n');
@@ -452,7 +451,6 @@ const molFileToJSON = (molFile) => {
         bondsArray.push(bond)
     }
     molObj.bonds = bondsArray;
-
 
     return molObj;
 }
