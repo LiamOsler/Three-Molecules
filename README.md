@@ -223,65 +223,7 @@ animate();
 
 When we call the `init()` function before the `animate()` function, the geometry is added to the scene and the camera positioned before the animation loop starts.
 
-## Step 3: Load a mol file
 
-Now that we have a basic scene set up, we can start to add some more complex objects to the scene. We will start by creating a function that fetches a mol file from the server, and then parses it to create a Three.js mesh.
-
-First, create folder where you will store your mol files, in my case I will create a folder called `molecules` in the root of the project and add some mol files retrieved from ChemSpider and named using their respective ChemSpider IDs:
-
-```bash
-.
-├── index.html
-├── js
-│   └── three.min.js
-├── molecules
-│   └── 2424.mol
-└── README.md
-```
-
-I've added 2424.mol to the molecules folder, the Chemspider ID for caffeine.
-
-Let's fetch the mol file from the server and parse it to create a Three.js mesh. We will start by fetching the mol file from the server using the `fetch()` function.
-
-```js
-function init(){
-    fetch('molecules/2424.mol')
-    .then(response => response.text())
-    .then(data => {
-        console.log(data);
-    });
-}
-```
-
-We can refactor the init function to use a parameter which defines the ID of the molfile to load:
-
-```js
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-
-function init(CSID){
-    fetch('molecules/' + CSID + '.mol')
-    .then(response => response.text())
-    .then(data => {
-        console.log(data);
-    });
-}
-
-function animate() {
-    requestAnimationFrame( animate );
-    renderer.render( scene, camera );
-}
-
-const defaultCSID = 2424;
-
-init(defaultCSID);
-animate();
-```
-
-This will log the mol file to the console. In order to understand the mol file format, articles [like this](https://chem.libretexts.org/Courses/University_of_Arkansas_Little_Rock/ChemInformatics_(2017)%3A_Chem_4399_5399/2.2%3A_Chemical_Representations_on_Computer%3A_Part_II/2.2.2%3A_Anatomy_of_a_MOL_file) are very useful as well as the [Wikipedia article on chemical table file formats](https://en.wikipedia.org/wiki/Chemical_table_file#:~:text=An%20MDL%20Molfile%20is%20a,sections%20for%20more%20complex%20information.).
-
+With everything set up, you should see a green cube in the center of the browser window that looks like this:
+![green cube](/screenshots/step-2.png)
 
