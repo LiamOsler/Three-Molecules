@@ -169,7 +169,9 @@ Put everything together, and your code will look like this:
         scene.add( cube );
 
         camera.position.x = 5;
+        camera.position.y = 5;
         camera.position.z = 5;
+        camera.lookAt(0,0,0);
         
         function animate() {
             requestAnimationFrame( animate );
@@ -182,3 +184,43 @@ Put everything together, and your code will look like this:
 ```
 
 You should see a green cube in the center of the browser window.
+
+## Step 2: Create an init() function
+
+Now that we have a basic scene set up, we can start to add some more complex objects to the scene. We will start by creating a function called `init()` that will be called when the page loads, and will contain all of the code that we need to set up the scene.
+
+We need to declare the `scene`, `camera`, and `renderer` variables globally, then define items like geometries within the `init()` function:
+
+and then we can define the `init()` function:
+
+```js
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+function init(){
+    const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    const cube = new THREE.Mesh( geometry, material );
+    scene.add( cube );
+
+    camera.position.x = 5;
+    camera.position.y = 5;
+    camera.position.z = 5;
+    camera.lookAt(0,0,0);
+}
+
+function animate() {
+    requestAnimationFrame( animate );
+    renderer.render( scene, camera );
+}
+init();
+animate();
+```
+
+When we call the `init()` function before the `animate()` function, the geometries and textures are added to the scene before the animation loop starts.
+
+
