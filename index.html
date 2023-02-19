@@ -3,6 +3,8 @@
 <head>
     <title>Three JS Molecules</title>
     <script src="js/three.min.js"></script>
+    <script src="js/molFileToJSON.js"></script>
+
     <style>
         body { margin: 0; }
     </style> 
@@ -16,16 +18,27 @@
         renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( renderer.domElement );
 
+        const geometry = new THREE.SphereGeometry( .1, 32, 32 );
+        const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+
+        function drawMolecule(molFile){
+            const molObject = molFileToJSON(molFile);
+            
+            for(let item of molObject.atoms){
+                const sphere = new THREE.Mesh( geometry, material );
+                sphere.position.x = item.position.x;
+                sphere.position.y = item.position.y;
+                sphere.position.z = item.position.z;
+                scene.add( sphere );
+            }
+        }
+
         function init(CSID){
             fetch('molecules/' + CSID + '.mol')
                 .then(response => response.text())
-                .then(data => {
-                    console.log(data);
+                .then(molFile => {
+                    drawMolecule(molFile);
                 });
-            const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-            const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-            const cube = new THREE.Mesh( geometry, material );
-            scene.add( cube );
 
             camera.position.x = 5;
             camera.position.y = 5;

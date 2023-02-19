@@ -2,7 +2,7 @@
 A demonstration of how to draw molecular diagrams with Three.js
 
 ## Getting Started
-This is a demonstration of how to draw molecular diagrams with Three.js. It is based on the [Three.js](https://threejs.org/) library, which is a JavaScript library for drawing 3D graphics in a web browser.
+This is a demonstration of how to draw molecular diagrams with Three.js. It is based on the [Three.js](https://threejs.org/) library, which is a JavaScript library for drawing 3D graphics in a web browser. This code takes a `.mol` file and converts it to a JSON object, which is then used to draw the 3D model of the molecule.
 
 ### Accessing the Individual Steps
 Each major step involved in building this application is in a separate branch of this repository. To access the files at each step, you need to clone this repository to your computer, and then check out the branch for the exercise you want to work on.
@@ -424,7 +424,7 @@ const molFileToJSON = (molFile) => {
     
     const countChunks = [];
     for (let i = 0; i < split[3].length; i += 3) {
-        countChunks.push(split[3].slice(i, i+3));
+        countChunks.push(split[3].slice(i, i + 3));
     }
 
     molObj.counts.molecules = countChunks[0].trim();
@@ -455,3 +455,81 @@ const molFileToJSON = (molFile) => {
     return molObj;
 }
 ```
+
+## Step 5: import the conversion function into the project:
+
+We can make a new file and call it `molFileToJSON.js`. We can then import the function into the project by adding the following line to the top of `index.js`:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Three JS Molecules</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/molFileToJSON.js"></script>
+
+    <style>
+        body { margin: 0; }
+    </style> 
+</head>
+```
+
+We can then call the function in the `drawMolecule` function:
+
+```html
+<body>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+
+        const geometry = new THREE.SphereGeometry( .1, 32, 32 );
+        const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+
+        function drawMolecule(molFile){
+            const molObject = molFileToJSON(molFile);
+            
+            for(let item of molObject.atoms){
+                const sphere = new THREE.Mesh( geometry, material );
+                sphere.position.x = item.position.x;
+                sphere.position.y = item.position.y;
+                sphere.position.z = item.position.z;
+                scene.add( sphere );
+            }
+        }
+
+        function init(CSID){
+            fetch('molecules/' + CSID + '.mol')
+                .then(response => response.text())
+                .then(molFile => {
+                    drawMolecule(molFile);
+                });
+
+            camera.position.x = 5;
+            camera.position.y = 5;
+            camera.position.z = 5;
+            camera.lookAt(0,0,0);
+        }
+        
+        function animate() {
+            requestAnimationFrame( animate );
+            renderer.render( scene, camera );
+        }
+
+        const defaultCSID = 2424;
+        
+        init(defaultCSID);
+        animate();
+    </script>
+</body>
+</html>
+```
+
+You will now see a sphere for each atom in the molecule, positioned according to the coordinates specified in the `.mol` file. The spheres are all the same size and color, and due to a lack of shading, appear to be flat.
+
+What you should see so far will look like this:
+![Step-5](/screenshots/step-5.png)
+
