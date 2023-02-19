@@ -223,6 +223,9 @@ animate();
 
 When we call the `init()` function before the `animate()` function, the geometry is added to the scene and the camera positioned before the animation loop starts.
 
+With the code above working, you will see a green cube in the center of the browser window that looks something like this:
+![green cube](/screenshots/step-2.png)
+
 ## Step 3: Load a mol file
 
 Now that we have a basic scene set up, we can start to add some more complex objects to the scene. We will start by creating a function that fetches a mol file from the server, and then parses it to create a Three.js mesh.
