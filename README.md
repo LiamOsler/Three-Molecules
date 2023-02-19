@@ -221,6 +221,6 @@ init();
 animate();
 ```
 
-When we call the `init()` function before the `animate()` function, the geometries and textures are added to the scene before the animation loop starts.
+When we call the `init()` function before the `animate()` function, the geometry is added to the scene and the camera positioned before the animation loop starts.
 
 
