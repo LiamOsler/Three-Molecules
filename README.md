@@ -634,3 +634,6 @@ This particular mol file of caffeine has been centered to the origin, which is u
 In contrast, see what happens when we load a different molecule where the origin is not at the center of the molecule (in this case, Sodium Stearate):
 ![Step-9-2](/screenshots/step-9-2.png)
 
+Therefore, we may want to center the molecule to the origin when we load it. More on this later.
+
+
