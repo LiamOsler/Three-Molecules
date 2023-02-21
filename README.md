@@ -592,3 +592,28 @@ for(let item of molObject.atoms){
     ...
 }
 ```
+## Step 8: Add lighting:
+
+See: https://threejs.org/docs/#api/en/lights/SpotLight
+
+We can add ambient and spotlighting in our scene by including the following lines in the `init` function:
+
+```js
+const spotLight = new THREE.SpotLight( 0xffffff );
+spotLight.position.set( 100, 1000, 100 );
+spotLight.map = new THREE.TextureLoader().load( url );
+
+spotLight.castShadow = true;
+
+spotLight.shadow.mapSize.width = 1024;
+spotLight.shadow.mapSize.height = 1024;
+
+spotLight.shadow.camera.near = 500;
+spotLight.shadow.camera.far = 4000;
+spotLight.shadow.camera.fov = 30;
+
+scene.add( spotLight );
+```
+The result will be something like this:
+![Step-8](/screenshots/step-8.png)
+
