@@ -536,3 +536,15 @@ You will now see a sphere for each atom in the molecule, positioned according to
 What you should see so far will look like this:
 ![Step-5](/screenshots/step-5.png)
 
+## Step 6: Clear the scene when the init function is called:
+
+We can clear the scene when the `init` function is called by adding the following lines to the start of the `init` function:
+
+```js
+while(scene.children.length > 0){ 
+    scene.remove(scene.children[0]); 
+}
+```
+
+This removes the spheres from the scene, so that when the `init` function is called again, the spheres are not drawn again. By changing the `CSID` variable to a different value, a different molecule can be drawn (so long as the  corresponding file is present in the `molecules` folder).
+

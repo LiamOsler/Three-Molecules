@@ -21,11 +21,35 @@
         const geometry = new THREE.SphereGeometry( .1, 32, 32 );
         const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 
+        const moleculeGeometries = {
+            "C": new THREE.SphereGeometry( .8, 32, 32 ),
+            "H": new THREE.SphereGeometry( .3, 32, 32 ),
+            "O": new THREE.SphereGeometry( .5, 32, 32 ),
+            "N": new THREE.SphereGeometry( .6, 32, 32 ),
+            "S": new THREE.SphereGeometry( .8, 32, 32 ),
+            "P": new THREE.SphereGeometry( .9, 32, 32 ),
+            "F": new THREE.SphereGeometry( .4, 32, 32 ),
+            "Cl": new THREE.SphereGeometry( .5, 32, 32 ),
+            "Br": new THREE.SphereGeometry( .6, 32, 32 ),
+            "I": new THREE.SphereGeometry( .7, 32, 32 ),
+        }
+        const moleculeMaterials = {
+            "C": new THREE.MeshBasicMaterial( { color: 0x333333 } ),
+            "H": new THREE.MeshBasicMaterial( { color: 0xffffff } ),
+            "O": new THREE.MeshBasicMaterial( { color: 0xff0000 } ),
+            "N": new THREE.MeshBasicMaterial( { color: 0x0000ff } ),
+            "S": new THREE.MeshBasicMaterial( { color: 0xffff00 } ),
+            "P": new THREE.MeshBasicMaterial( { color: 0xff00ff } ),
+            "F": new THREE.MeshBasicMaterial( { color: 0x00ff00 } ),
+            "Cl": new THREE.MeshBasicMaterial( { color: 0x00ff00 } ),
+            "Br": new THREE.MeshBasicMaterial( { color: 0x00ff00 } ),
+        }
+
         function drawMolecule(molFile){
             const molObject = molFileToJSON(molFile);
             
             for(let item of molObject.atoms){
-                const sphere = new THREE.Mesh( geometry, material );
+                const sphere = new THREE.Mesh( moleculeGeometries[item.type], moleculeMaterials[item.type] );
                 sphere.position.x = item.position.x;
                 sphere.position.y = item.position.y;
                 sphere.position.z = item.position.z;
@@ -34,6 +58,10 @@
         }
 
         function init(CSID){
+            while(scene.children.length > 0){ 
+                scene.remove(scene.children[0]); 
+            }
+
             fetch('molecules/' + CSID + '.mol')
                 .then(response => response.text())
                 .then(molFile => {
