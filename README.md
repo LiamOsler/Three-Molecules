@@ -617,3 +617,18 @@ scene.add( spotLight );
 The result will be something like this:
 ![Step-8](/screenshots/step-8.png)
 
+## Step 9: Add an axis helper:
+
+An axis helper is a useful tool built in to Three.js for visualizing orientation. We can add an axis helper to the scene by including the following line in the `init` function:
+
+```js
+const axesHelper = new THREE.AxesHelper( 5 );
+scene.add( axesHelper );
+```
+
+With the axis helper in place, you should see something like this:
+![Step-9](/screenshots/step-9.png)
+
+This particular mol file of caffeine has been centered to the origin, which is useful if we consider that we will want to be able to rotate the molecule later on in the tutorial.
+
+In contrast, see what happens when we load a different molecule where the origin is not at the center of the molecule (in this case, Sodium Stearate)
