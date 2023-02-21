@@ -631,4 +631,6 @@ With the axis helper in place, you should see something like this:
 
 This particular mol file of caffeine has been centered to the origin, which is useful if we consider that we will want to be able to rotate the molecule later on in the tutorial.
 
-In contrast, see what happens when we load a different molecule where the origin is not at the center of the molecule (in this case, Sodium Stearate)
+In contrast, see what happens when we load a different molecule where the origin is not at the center of the molecule (in this case, Sodium Stearate):
+![Step-9-2](/screenshots/step-9-2.png)
+
