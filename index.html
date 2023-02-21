@@ -34,15 +34,15 @@
             "I": new THREE.SphereGeometry( .7, 32, 32 ),
         }
         const moleculeMaterials = {
-            "C": new THREE.MeshBasicMaterial( { color: 0x333333 } ),
-            "H": new THREE.MeshBasicMaterial( { color: 0xffffff } ),
-            "O": new THREE.MeshBasicMaterial( { color: 0xff0000 } ),
-            "N": new THREE.MeshBasicMaterial( { color: 0x0000ff } ),
-            "S": new THREE.MeshBasicMaterial( { color: 0xffff00 } ),
-            "P": new THREE.MeshBasicMaterial( { color: 0xff00ff } ),
-            "F": new THREE.MeshBasicMaterial( { color: 0x00ff00 } ),
-            "Cl": new THREE.MeshBasicMaterial( { color: 0x00ff00 } ),
-            "Br": new THREE.MeshBasicMaterial( { color: 0x00ff00 } ),
+            "C": new THREE.MeshStandardMaterial( { color: 0x333333 } ),
+            "H": new THREE.MeshStandardMaterial( { color: 0xffffff } ),
+            "O": new THREE.MeshStandardMaterial( { color: 0xff0000 } ),
+            "N": new THREE.MeshStandardMaterial( { color: 0x0000ff } ),
+            "S": new THREE.MeshStandardMaterial( { color: 0xffff00 } ),
+            "P": new THREE.MeshStandardMaterial( { color: 0xff00ff } ),
+            "F": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+            "Cl": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+            "Br": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
         }
 
         function drawMolecule(molFile){
@@ -72,6 +72,7 @@
             camera.position.y = 5;
             camera.position.z = 5;
             camera.lookAt(0,0,0);
+            
         }
         
         function animate() {

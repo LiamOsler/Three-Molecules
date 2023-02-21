@@ -548,3 +548,47 @@ while(scene.children.length > 0){
 
 This removes the spheres from the scene, so that when the `init` function is called again, the spheres are not drawn again. By changing the `CSID` variable to a different value, a different molecule can be drawn (so long as the  corresponding file is present in the `molecules` folder).
 
+## Step 7: Style the spheres:
+
+The various elements of the molecule can be styled by changing the values of the `geometry` and `material` variables. The `geometry` variable is used to define the shape of the sphere, and the `material` variable is used to define the color and shading of the sphere. The `geometry` variable is defined as follows:
+
+```js
+const sphere = new THREE.Mesh( geometry, material );
+```
+
+If we want to vary the size of the sphere, we can use an object to hold these values in a map, and then use the `atom.type` value to select the appropriate item.
+
+```js
+const moleculeGeometries = {
+    "C": new THREE.SphereGeometry( .8, 32, 32 ),
+    "H": new THREE.SphereGeometry( .3, 32, 32 ),
+    "O": new THREE.SphereGeometry( .5, 32, 32 ),
+    "N": new THREE.SphereGeometry( .6, 32, 32 ),
+    "S": new THREE.SphereGeometry( .8, 32, 32 ),
+    "P": new THREE.SphereGeometry( .9, 32, 32 ),
+    "F": new THREE.SphereGeometry( .4, 32, 32 ),
+    "Cl": new THREE.SphereGeometry( .5, 32, 32 ),
+    "Br": new THREE.SphereGeometry( .6, 32, 32 ),
+    "I": new THREE.SphereGeometry( .7, 32, 32 ),
+}
+const moleculeMaterials = {
+    "C": new THREE.MeshStandardMaterial( { color: 0x333333 } ),
+    "H": new THREE.MeshStandardMaterial( { color: 0xffffff } ),
+    "O": new THREE.MeshStandardMaterial( { color: 0xff0000 } ),
+    "N": new THREE.MeshStandardMaterial( { color: 0x0000ff } ),
+    "S": new THREE.MeshStandardMaterial( { color: 0xffff00 } ),
+    "P": new THREE.MeshStandardMaterial( { color: 0xff00ff } ),
+    "F": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+    "Cl": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+    "Br": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+}
+```
+
+And we then access these items in the `drawMolecule` function when we define the sphere:
+
+```js
+for(let item of molObject.atoms){
+    const sphere = new THREE.Mesh( moleculeGeometries[item.type], moleculeMaterials[item.type] );
+    ...
+}
+```
