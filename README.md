@@ -797,6 +797,12 @@ controls.update();
 
 With everything in place, we should be able to rotate the camera around the scene by clicking and dragging the mouse. Dragging the mouse in combination with the shift or control key will allow us to pan the camera, and the scroll wheel will allow us to zoom in and out.
 
+Using OrbitControls should look a bit like this:
+![Step-12](/screenshots/step-12.gif)
+
+## Step 13: Add the molecule to a group, rather than the scene:
+Since we will be adding multiple molecules to the scene, we can add each molecule to a group, and then add the group to the scene. This will allow us to manipulate the group as a whole, rather than each individual molecule.
+
 
 
 
