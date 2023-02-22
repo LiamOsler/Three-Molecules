@@ -10,6 +10,8 @@
             }
         }
     </script>
+    <script type="text/javascript" src="js/datgui/dat.gui.min.js"></script>
+
     <script src="js/molFileToJSON.js"></script>
 
     <style>
@@ -32,32 +34,36 @@
         const controls = new OrbitControls( camera, renderer.domElement );
 
         const moleculeGeometries = {
-            "C": new THREE.SphereGeometry( .8, 32, 32 ),
-            "H": new THREE.SphereGeometry( .3, 32, 32 ),
-            "O": new THREE.SphereGeometry( .5, 32, 32 ),
-            "N": new THREE.SphereGeometry( .6, 32, 32 ),
-            "S": new THREE.SphereGeometry( .8, 32, 32 ),
-            "P": new THREE.SphereGeometry( .9, 32, 32 ),
-            "F": new THREE.SphereGeometry( .4, 32, 32 ),
+            "C" : new THREE.SphereGeometry( .8, 32, 32 ),
+            "H" : new THREE.SphereGeometry( .3, 32, 32 ),
+            "O" : new THREE.SphereGeometry( .5, 32, 32 ),
+            "N" : new THREE.SphereGeometry( .6, 32, 32 ),
+            "S" : new THREE.SphereGeometry( .8, 32, 32 ),
+            "P" : new THREE.SphereGeometry( .9, 32, 32 ),
+            "F" : new THREE.SphereGeometry( .4, 32, 32 ),
             "Cl": new THREE.SphereGeometry( .5, 32, 32 ),
             "Br": new THREE.SphereGeometry( .6, 32, 32 ),
-            "I": new THREE.SphereGeometry( .7, 32, 32 ),
+            "I" : new THREE.SphereGeometry( .7, 32, 32 ),
         }
         const moleculeMaterials = {
-            "C": new THREE.MeshStandardMaterial( { color: 0x333333 } ),
-            "H": new THREE.MeshStandardMaterial( { color: 0xffffff } ),
-            "O": new THREE.MeshStandardMaterial( { color: 0xff0000 } ),
-            "N": new THREE.MeshStandardMaterial( { color: 0x0000ff } ),
-            "S": new THREE.MeshStandardMaterial( { color: 0xffff00 } ),
-            "P": new THREE.MeshStandardMaterial( { color: 0xff00ff } ),
-            "F": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
-            "Cl": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
-            "Br": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+            "C" : new THREE.MeshStandardMaterial( { color: 0x333333, opacity: 0.9, transparent: true} ),
+            "H" : new THREE.MeshStandardMaterial( { color: 0xffffff, opacity: 0.9, transparent: true} ),
+            "O" : new THREE.MeshStandardMaterial( { color: 0xff0000, opacity: 0.9, transparent: true} ),
+            "N" : new THREE.MeshStandardMaterial( { color: 0x0000ff, opacity: 0.9, transparent: true} ),
+            "S" : new THREE.MeshStandardMaterial( { color: 0xffff00, opacity: 0.9, transparent: true} ),
+            "P" : new THREE.MeshStandardMaterial( { color: 0xff00ff, opacity: 0.9, transparent: true} ),
+            "F" : new THREE.MeshStandardMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+            "Cl": new THREE.MeshStandardMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+            "Br": new THREE.MeshStandardMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+            "I" : new THREE.MeshStandardMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
         }
 
         let moleculeGroup = new THREE.Group();
 
         function drawMolecule(molFile){
+            while(moleculeGroup.children.length > 0){ 
+                moleculeGroup.remove(moleculeGroup.children[0]); 
+            }
             const molObject = molFileToJSON(molFile);
 
             let firstPoint = new THREE.Vector3(
@@ -118,7 +124,7 @@
             scene.add( moleculeGroup );
         }
 
-        function getMolecule(CSID){
+        export function getMolecule(CSID){
             fetch('molecules/' + CSID + '.mol')
                 .then(response => response.text())
                 .then(molFile => {
@@ -127,32 +133,51 @@
         }
 
         function init(defaultCSID){
-            while(scene.children.length > 0){ 
-                scene.remove(scene.children[0]); 
-            }
+
             getMolecule(defaultCSID);
 
             const spotLight = new THREE.SpotLight( 0xffffff );
             spotLight.position.set( 100, 1000, 100 );
-
             spotLight.castShadow = true;
-
             spotLight.shadow.mapSize.width = 1024;
             spotLight.shadow.mapSize.height = 1024;
-
             spotLight.shadow.camera.near = 500;
             spotLight.shadow.camera.far = 4000;
             spotLight.shadow.camera.fov = 30;
-
             scene.add( spotLight );
+
+            const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+            scene.add( light );
+
 
             camera.position.x = 5;
             camera.position.y = 5;
             camera.position.z = 5;
             camera.lookAt(0,0,0);
 
-            const axesHelper = new THREE.AxesHelper( 5 );
-            scene.add( axesHelper );
+            // const axesHelper = new THREE.AxesHelper( 5 );
+            // scene.add( axesHelper );
+
+            const gui = new dat.GUI();
+            
+            const moleculePosition = gui.addFolder('Position')
+            moleculePosition.add(moleculeGroup.position, 'x', -10, 10)
+            moleculePosition.add(moleculeGroup.position, 'y', -10, 10)
+            moleculePosition.add(moleculeGroup.position, 'z', -10, 10)
+
+            const moleculeRotation = gui.addFolder('Rotation')
+            moleculeRotation.add(moleculeGroup.rotation, 'x', -Math.PI, Math.PI)
+            moleculeRotation.add(moleculeGroup.rotation, 'y', -Math.PI, Math.PI)
+            moleculeRotation.add(moleculeGroup.rotation, 'z', -Math.PI, Math.PI)
+            
+            const moleculeScale = gui.addFolder('Scale')
+            const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 1.5).name("Scaling Factor")
+            scaleX.onChange(function(value){
+            moleculeGroup.scale.y = value;
+            moleculeGroup.scale.z = value;
+            })
+            // gui.add(autoRotate, "switch").name("Auto Rotate");
+
         }
         
         function animate() {
@@ -167,6 +192,8 @@
         init(defaultCSID);
 
         animate();
+
+        window.getMolecule = getMolecule;
 
     </script>
 </body>

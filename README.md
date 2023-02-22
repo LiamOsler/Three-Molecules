@@ -839,7 +839,42 @@ This will allow us to manipulate the group as a whole, rather than each individu
 ## Step 14: Adding datgui and manipulating the molecule group:
 We can use datgui to add a user interface to our application. This will allow us to manipulate the molecule group, and see the changes in real time.
 
-To use datgui, download or install it using npm.
+To use datgui, download or install it using npm. To use it with the project, we can add the following to the head of the HTML file:
 
+```html
+<head>
+    ...
+    <script type="text/javascript" src="js/datgui/dat.gui.min.js"></script>
+    ...
+</head>
+```
 
+We can then add a new GUI in the init function:
 
+```diff
++   const gui = new dat.GUI();
+```
+
+Then, we can add a folder to the GUI, and add a slider to the folder:
+
+```js
+const moleculePosition = gui.addFolder('Position')
+moleculePosition.add(moleculeGroup.position, 'x', -10, 10)
+moleculePosition.add(moleculeGroup.position, 'y', -10, 10)
+moleculePosition.add(moleculeGroup.position, 'z', -10, 10)
+
+const moleculeRotation = gui.addFolder('Rotation')
+moleculeRotation.add(moleculeGroup.rotation, 'x', -Math.PI, Math.PI)
+moleculeRotation.add(moleculeGroup.rotation, 'y', -Math.PI, Math.PI)
+moleculeRotation.add(moleculeGroup.rotation, 'z', -Math.PI, Math.PI)
+
+const moleculeScale = gui.addFolder('Scale')
+const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 1.5).name("Scaling Factor")
+scaleX.onChange(function(value){
+moleculeGroup.scale.y = value;
+moleculeGroup.scale.z = value;
+})
+```
+
+This will give you a set of controls that will allow you to manipulate the molecule group. The controls should look something like this:
+![Step-14](/screenshots/step-14.png)
