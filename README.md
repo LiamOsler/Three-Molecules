@@ -716,3 +716,39 @@ sphere.position.z = item.position.z - moleculeCenter.z;
 If we go back and load the Sodium Stearate molecule, we should see something like this:
 
 ![Step-10](/screenshots/step-10.png)
+
+## Step 11: Convert to using ES6 modules:
+
+First, download `three.modules.js` file from the Three.js repository or install Three.js using npm:
+https://threejs.org/docs/#manual/en/introduction/Installation
+
+Next, remove the script tag for `three.js` from the `index.html` file:
+
+```diff
+<head>
+    <title>Three JS Molecules</title>
+-   <script src="js/three.min.js"></script> -->
+
+    <script src="js/molFileToJSON.js"></script>
+
+    <style>
+        body { margin: 0; }
+    </style> 
+</head>
+```
+And we then add `type="module"` to the script tag for `molFileToJSON.js`:
+
+```html
+<script type= "module" >
+</script>
+```
+
+Then, import the THREE module:
+
+```diff
+<script type= "module" >
++   import * as THREE from './js/three.module.js';
+</script>
+```
+
+This will allow us to use the ES6 module syntax in our `molFileToJSON.js` file.
