@@ -906,3 +906,34 @@ if(autoRotate.switch){
 Then, we'll be able to toggle auto-rotation on and off, and see the molecule rotate in real time, like so:
 
 ![Step-15](/screenshots/step-15.gif)
+
+## Step 16: Adding buttons to toggle the molecule type in the menu:
+
+We can add buttons to the menu, to toggle between the different molecule types. To do this, we can add a new function to the GUI object, that will be called when the button is clicked:
+
+```js
+var params = {
+    showCaffeine : function(CSID) { 
+        getMolecule(2424);
+    },
+    showEthanol : function(CSID) { 
+        getMolecule(682);
+    },
+    showCatnip : function(CSID) { 
+        getMolecule(141747);
+    },
+    showCinnamon : function(CSID) { 
+        getMolecule(553117);
+    }
+};
+```
+
+Then, we can add the buttons to the menu:
+
+```js
+const moleculeType = gui.addFolder('Example Molecules   ')
+moleculeType.add(params, 'showCaffeine').name('Caffeine (Coffee, Chocolate, Tea)');
+moleculeType.add(params, 'showEthanol').name('Ethanol (Alcohol)');
+moleculeType.add(params, 'showCatnip').name('Nepetalactone (Catnip)');
+moleculeType.add(params, 'showCinnamon').name('Cinnamaldehyde (Cinnamon Smell)');
+```
