@@ -752,3 +752,51 @@ Then, import the THREE module:
 ```
 
 This will allow us to use the ES6 module syntax in our `molFileToJSON.js` file.
+
+## Step 12: Import OrbitControls:
+
+OrbitControls is an addition to Three.js that allows us to rotate the camera around the scene. We can import OrbitControls by adding the following line to the `molFileToJSON.js` file. First, start by saving the `OrbitControls.js` file to the `./js/` folder, the continue by adding an import map to the head of the HTMl file:
+```
+<script type="importmap">
+    {
+        "imports": {
+            "three": "./js/three.module.js",
+            "OrbitControls": "./js/OrbitControls.js"
+        }
+    }
+</script>
+```
+Then, we can import OrbitControls by adding the following to our main script:
+
+```js
+import {OrbitControls} from './js/OrbitControls.js';
+```
+
+Then, in the global scope, we can create a new instance of OrbitControls, after the camera and render have been created:
+
+```diff
+    import * as THREE from './js/three.module.js';
++   import {OrbitControls} from './js/ OrbitControls.js';
+ 
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(    75, window.innerWidth / window.innerHeight,   0. 1, 1000 ); 
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.   innerHeight );
+    document.body.appendChild( renderer.   domElement ); 
+
++   const controls = new THREE.OrbitControls( camera, renderer.domElement );
+```
+
+Then, in the animation loop, we can call the `update()` method on the controls object:
+
+```js
+controls.update();
+```
+
+With everything in place, we should be able to rotate the camera around the scene by clicking and dragging the mouse. Dragging the mouse in combination with the shift or control key will allow us to pan the camera, and the scroll wheel will allow us to zoom in and out.
+
+
+
+

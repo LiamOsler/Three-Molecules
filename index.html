@@ -2,7 +2,14 @@
 <html>
 <head>
     <title>Three JS Molecules</title>
-    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./js/three.module.js",
+                "OrbitControls": "./js/OrbitControls.js"
+            }
+        }
+    </script>
     <script src="js/molFileToJSON.js"></script>
 
     <style>
@@ -10,8 +17,10 @@
     </style> 
 </head>
 <body>
-    <script type= "module" >
+    <script type= "module">
+        import {OrbitControls} from './js/OrbitControls.js';
         import * as THREE from './js/three.module.js';
+
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -19,6 +28,8 @@
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( renderer.domElement );
+
+        const controls = new OrbitControls( camera, renderer.domElement );
 
         const moleculeGeometries = {
             "C": new THREE.SphereGeometry( .8, 32, 32 ),
@@ -140,12 +151,16 @@
         function animate() {
             requestAnimationFrame( animate );
             renderer.render( scene, camera );
+
+            controls.update();
         }
 
         const defaultCSID = 2424;
         
         init(defaultCSID);
+
         animate();
+
     </script>
 </body>
 </html>
