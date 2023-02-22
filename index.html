@@ -59,16 +59,16 @@
             "I" : new THREE.SphereGeometry( .7, 32, 32 ),
         }
         const moleculeMaterials = {
-            "C" : new THREE.MeshStandardMaterial( { color: 0x333333, opacity: 0.9, transparent: true} ),
-            "H" : new THREE.MeshStandardMaterial( { color: 0xffffff, opacity: 0.9, transparent: true} ),
-            "O" : new THREE.MeshStandardMaterial( { color: 0xff0000, opacity: 0.9, transparent: true} ),
-            "N" : new THREE.MeshStandardMaterial( { color: 0x0000ff, opacity: 0.9, transparent: true} ),
-            "S" : new THREE.MeshStandardMaterial( { color: 0xffff00, opacity: 0.9, transparent: true} ),
-            "P" : new THREE.MeshStandardMaterial( { color: 0xff00ff, opacity: 0.9, transparent: true} ),
-            "F" : new THREE.MeshStandardMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
-            "Cl": new THREE.MeshStandardMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
-            "Br": new THREE.MeshStandardMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
-            "I" : new THREE.MeshStandardMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+            "C" : new THREE.MeshPhongMaterial( { color: 0x333333, opacity: 0.9, transparent: true} ),
+            "H" : new THREE.MeshPhongMaterial( { color: 0xffffff, opacity: 0.9, transparent: true} ),
+            "O" : new THREE.MeshPhongMaterial( { color: 0xff0000, opacity: 0.9, transparent: true} ),
+            "N" : new THREE.MeshPhongMaterial( { color: 0x0000ff, opacity: 0.9, transparent: true} ),
+            "S" : new THREE.MeshPhongMaterial( { color: 0xffff00, opacity: 0.9, transparent: true} ),
+            "P" : new THREE.MeshPhongMaterial( { color: 0xff00ff, opacity: 0.9, transparent: true} ),
+            "F" : new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+            "Cl": new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+            "Br": new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+            "I" : new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
         }
 
         let moleculeGroup = new THREE.Group();
@@ -137,6 +137,21 @@
             scene.add( moleculeGroup );
         }
 
+        var params = {
+            showCaffeine : function(CSID) { 
+                getMolecule(2424);
+            },
+            showEthanol : function(CSID) { 
+                getMolecule(682);
+            },
+            showCatnip : function(CSID) { 
+                getMolecule(141747);
+            },
+            showCinnamon : function(CSID) { 
+                getMolecule(553117);
+            }
+        };
+
         export function getMolecule(CSID){
             fetch('molecules/' + CSID + '.mol')
                 .then(response => response.text())
@@ -159,9 +174,8 @@
             spotLight.shadow.camera.fov = 30;
             scene.add( spotLight );
 
-            const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+            const light = new THREE.AmbientLight( 0xffffff ); // soft white light
             scene.add( light );
-
 
             camera.position.x = 5;
             camera.position.y = 5;
@@ -172,6 +186,13 @@
             // scene.add( axesHelper );
 
             const gui = new dat.GUI();
+
+            const moleculeType = gui.addFolder('Example Molecules')
+            moleculeType.add(params, 'showCaffeine').name('Caffeine (Coffee, Chocolate, Tea)');
+            moleculeType.add(params, 'showEthanol').name('Ethanol (Alcohol)');
+            moleculeType.add(params, 'showCatnip').name('Nepetalactone (Catnip)');
+            moleculeType.add(params, 'showCinnamon').name('Cinnamaldehyde (Cinnamon Smell)');
+
             
             const moleculePosition = gui.addFolder('Position')
             moleculePosition.add(moleculeGroup.position, 'x', -10, 10)
@@ -185,7 +206,6 @@
             moleculeRotation.add(autoRotateX, "switch").name("Auto Rotate X");
             moleculeRotation.add(autoRotateY, "switch").name("Auto Rotate Y");
             moleculeRotation.add(autoRotateZ, "switch").name("Auto Rotate Z");
-
             
             const moleculeScale = gui.addFolder('Scale')
             const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 1.5).name("Scaling Factor")
@@ -193,8 +213,6 @@
                 moleculeGroup.scale.y = value;
                 moleculeGroup.scale.z = value;
             })
-
-            const moleculeType = gui.addFolder('Molecule')
 
         }
         
