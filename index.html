@@ -55,6 +55,8 @@
             "Br": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
         }
 
+        let moleculeGroup = new THREE.Group();
+
         function drawMolecule(molFile){
             const molObject = molFileToJSON(molFile);
 
@@ -110,20 +112,25 @@
                 sphere.position.x = item.position.x - moleculeCenter.x;
                 sphere.position.y = item.position.y - moleculeCenter.y;
                 sphere.position.z = item.position.z - moleculeCenter.z;
-                scene.add( sphere );
+                moleculeGroup.add( sphere );
             }
+
+            scene.add( moleculeGroup );
         }
 
-        function init(CSID){
-            while(scene.children.length > 0){ 
-                scene.remove(scene.children[0]); 
-            }
-
+        function getMolecule(CSID){
             fetch('molecules/' + CSID + '.mol')
                 .then(response => response.text())
                 .then(molFile => {
                     drawMolecule(molFile);
                 });
+        }
+
+        function init(defaultCSID){
+            while(scene.children.length > 0){ 
+                scene.remove(scene.children[0]); 
+            }
+            getMolecule(defaultCSID);
 
             const spotLight = new THREE.SpotLight( 0xffffff );
             spotLight.position.set( 100, 1000, 100 );

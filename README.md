@@ -803,6 +803,43 @@ Using OrbitControls should look a bit like this:
 ## Step 13: Add the molecule to a group, rather than the scene:
 Since we will be adding multiple molecules to the scene, we can add each molecule to a group, and then add the group to the scene. This will allow us to manipulate the group as a whole, rather than each individual molecule.
 
+Begin by creating a new group in the global scope:
+
+```js
+let moleculeGroup = new THREE.Group();
+
+function drawMolecule(molFile){
+    ...
+}
+```
+
+Then, instead of adding the sphere to the scene, we can add it to the group, and then add the group to the scene:
+
+```diff
+let moleculeGroup = new THREE.Group();
+
+function drawMolecule(molFile){
+    ...
+    for(let item of molObject.atoms){
+        const sphere = new THREE.Mesh( moleculeGeometries[item.type], moleculeMaterials[item.type] );
+        
+        sphere.position.x = item.position.x - moleculeCenter.x;
+        sphere.position.y = item.position.y - moleculeCenter.y;
+        sphere.position.z = item.position.z - moleculeCenter.z;
+        
+-       scene.add( sphere );
++       moleculeGroup.add( sphere );
+    }
++   scene.add( moleculeGroup );
+}
+```
+
+This will allow us to manipulate the group as a whole, rather than each individual molecule. This will be useful in the next step, when we add the ability to manipulate the molecule.
+
+## Step 14: Adding datgui and manipulating the molecule group:
+We can use datgui to add a user interface to our application. This will allow us to manipulate the molecule group, and see the changes in real time.
+
+To use datgui, download or install it using npm.
 
 
 
