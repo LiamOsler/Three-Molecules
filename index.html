@@ -23,6 +23,9 @@
         import {OrbitControls} from './js/OrbitControls.js';
         import * as THREE from './js/three.module.js';
 
+        const clock = new THREE.Clock();
+        let deltaTime = 0;
+        let totalTime = 0;
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -32,6 +35,16 @@
         document.body.appendChild( renderer.domElement );
 
         const controls = new OrbitControls( camera, renderer.domElement );
+        
+        let autoRotateX = {
+            switch: false
+        }
+        let autoRotateY = {
+            switch: false
+        }
+        let autoRotateZ = {
+            switch: false
+        }
 
         const moleculeGeometries = {
             "C" : new THREE.SphereGeometry( .8, 32, 32 ),
@@ -169,27 +182,43 @@
             moleculeRotation.add(moleculeGroup.rotation, 'x', -Math.PI, Math.PI)
             moleculeRotation.add(moleculeGroup.rotation, 'y', -Math.PI, Math.PI)
             moleculeRotation.add(moleculeGroup.rotation, 'z', -Math.PI, Math.PI)
+            moleculeRotation.add(autoRotateX, "switch").name("Auto Rotate X");
+            moleculeRotation.add(autoRotateY, "switch").name("Auto Rotate Y");
+            moleculeRotation.add(autoRotateZ, "switch").name("Auto Rotate Z");
+
             
             const moleculeScale = gui.addFolder('Scale')
             const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 1.5).name("Scaling Factor")
             scaleX.onChange(function(value){
-            moleculeGroup.scale.y = value;
-            moleculeGroup.scale.z = value;
+                moleculeGroup.scale.y = value;
+                moleculeGroup.scale.z = value;
             })
-            // gui.add(autoRotate, "switch").name("Auto Rotate");
+
+            const moleculeType = gui.addFolder('Molecule')
 
         }
         
         function animate() {
             requestAnimationFrame( animate );
             renderer.render( scene, camera );
+            
+            deltaTime = clock.getDelta();
+            totalTime += deltaTime;
+
+            if(autoRotateX.switch){
+                moleculeGroup.rotation.x-=.5*deltaTime;
+            }
+            if(autoRotateY.switch){
+                moleculeGroup.rotation.y-=.5*deltaTime;
+            }
+            if(autoRotateZ.switch){
+                moleculeGroup.rotation.z-=.5*deltaTime;
+            }
 
             controls.update();
         }
-
-        const defaultCSID = 2424;
         
-        init(defaultCSID);
+        init(2424);
 
         animate();
 

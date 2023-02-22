@@ -878,3 +878,25 @@ moleculeGroup.scale.z = value;
 
 This will give you a set of controls that will allow you to manipulate the molecule group. The controls should look something like this:
 ![Step-14](/screenshots/step-14.png)
+
+## Step 15: Adding auto-rotation:
+
+We can add auto-rotation to the molecule group by adding a few things, firstly, a variable to keep track of whether or not auto-rotation is enabled:
+
+```js
+let autoRotate = {
+    switch: false
+}
+```
+
+Then, within the `init()` function, we can add a checkbox to the GUI, and add an event listener to the checkbox:
+
+```js
+gui.add(autoRotate, "switch").name("Auto Rotate");
+```
+
+Finally, we can add a check to the animation loop, to see if auto-rotation is enabled, and if so, rotate the molecule group:
+
+```js
+
+```
