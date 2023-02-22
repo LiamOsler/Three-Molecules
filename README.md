@@ -634,6 +634,85 @@ This particular mol file of caffeine has been centered to the origin, which is u
 In contrast, see what happens when we load a different molecule where the origin is not at the center of the molecule (in this case, Sodium Stearate):
 ![Step-9-2](/screenshots/step-9-2.png)
 
-Therefore, we may want to center the molecule to the origin when we load it. More on this later.
+Therefore, we may want to center the molecule to the origin when we load it.
 
+## Step 10: Center the molecule to the origin:
+In order to center the molecule to the origin, we need to calculate the center of the molecule. To do this, we need to determine the minimum and maximum values for the x, y, and z coordinates. We can do this by iterating through the atoms in the molecule, and comparing the current value of the x, y, and z coordinates to the current minimum and maximum values. We can then use the midpoint of these values to center the molecule to the origin.
 
+First, we need to create a variable to hold the minimum and maximum values for the x, y, and z coordinates, and set these to an initial value using the first item in the atoms array.
+
+Doing this 
+
+```js
+//Get the first point in the molecule:  
+let firstPoint = new THREE.Vector3(
+    molObject.atoms[0].position.x, 
+    molObject.atoms[0].position.y, 
+    molObject.atoms[0].position.z);
+//Set the initial limits to the first point:
+let limits = {
+    x: {
+        min: firstPoint.x,
+        max: firstPoint.x
+    },
+    y: {
+        min: firstPoint.y,
+        max: firstPoint.y
+    },
+    z: {
+        min: firstPoint.z,
+        max: firstPoint.z
+    }
+}
+```
+
+Then, we need to iterate through the atoms in the molecule, and compare the current value of the x, y, and z coordinates to the current minimum and maximum values:
+
+```js
+for(let item of molObject.atoms){
+    let point = new THREE.Vector3(
+        item.position.x, 
+        item.position.y, 
+        item.position.z);
+
+    if(Number(point.x) < Number(limits.x.min)){
+        limits.x.min = point.x;
+    }
+    if(Number(point.x) > Number(limits.x.max)){
+        limits.x.max = point.x;
+    }
+    if(Number(point.y) < Number(limits.y.min)){
+        limits.y.min = point.y;
+    }
+    if(Number(point.y) > Number(limits.y.max)){
+        limits.y.max = point.y;
+    }
+    if(Number(point.z) < Number(limits.z.min)){
+        limits.z.min = point.z;
+    }
+    if(Number(point.z) > Number(limits.z.max)){
+        limits.z.max = point.z;
+    }
+}
+```
+
+Then, we can create a new variable to hold the midpoint of the x, y, and z coordinates:
+
+```js
+let moleculeCenter = new THREE.Vector3(
+    (Number((limits.x.min)) + Number(limits.x.max))/2,
+    (Number((limits.y.min)) + Number(limits.y.max))/2,
+    (Number((limits.z.min)) + Number(limits.z.max))/2);
+```
+
+Then, this can be used to center the molecule to the origin:
+
+```js
+sphere.position.x = item.position.x - moleculeCenter.x;
+sphere.position.y = item.position.y - moleculeCenter.y;
+sphere.position.z = item.position.z - moleculeCenter.z;
+```
+
+If we go back and load the Sodium Stearate molecule, we should see something like this:
+
+![Step-10](/screenshots/step-10.png)
