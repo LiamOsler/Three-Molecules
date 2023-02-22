@@ -898,5 +898,11 @@ gui.add(autoRotate, "switch").name("Auto Rotate");
 Finally, we can add a check to the animation loop, to see if auto-rotation is enabled, and if so, rotate the molecule group:
 
 ```js
-
+if(autoRotate.switch){
+    moleculeGroup.rotation.x-=.5*deltaTime;
+}
 ```
+
+Then, we'll be able to toggle auto-rotation on and off, and see the molecule rotate in real time, like so:
+
+![Step-15](/screenshots/step-15.gif)
