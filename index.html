@@ -16,9 +16,20 @@
 
     <style>
         body { margin: 0; }
+        #fileInput {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 0%;
+            opacity: 0;
+            cursor: pointer;
+        }
     </style> 
 </head>
 <body>
+    <input id="fileInput" type="file"  accept=".mol" />
+
     <script type= "module">
         import {OrbitControls} from './js/OrbitControls.js';
         import * as THREE from './js/three.module.js';
@@ -137,21 +148,6 @@
             scene.add( moleculeGroup );
         }
 
-        var params = {
-            showCaffeine : function(CSID) { 
-                getMolecule(2424);
-            },
-            showEthanol : function(CSID) { 
-                getMolecule(682);
-            },
-            showCatnip : function(CSID) { 
-                getMolecule(141747);
-            },
-            showCinnamon : function(CSID) { 
-                getMolecule(553117);
-            }
-        };
-
         export function getMolecule(CSID){
             fetch('molecules/' + CSID + '.mol')
                 .then(response => response.text())
@@ -159,6 +155,30 @@
                     drawMolecule(molFile);
                 });
         }
+
+
+        const moleculeFileInput = document.getElementById('fileInput');
+
+        const loadMoleculeFile = {
+            loadFile : function() { 
+                document.getElementById('fileInput').click();
+            },
+        };
+
+        const showExampleMolecules = {
+            showCaffeine : function() { 
+                getMolecule(2424);
+            },
+            showEthanol : function() { 
+                getMolecule(682);
+            },
+            showCatnip : function() { 
+                getMolecule(141747);
+            },
+            showCinnamon : function() { 
+                getMolecule(553117);
+            }
+        };
 
         function init(defaultCSID){
 
@@ -187,12 +207,16 @@
 
             const gui = new dat.GUI();
 
-            const moleculeType = gui.addFolder('Example Molecules')
-            moleculeType.add(params, 'showCaffeine').name('Caffeine (Coffee, Chocolate, Tea)');
-            moleculeType.add(params, 'showEthanol').name('Ethanol (Alcohol)');
-            moleculeType.add(params, 'showCatnip').name('Nepetalactone (Catnip)');
-            moleculeType.add(params, 'showCinnamon').name('Cinnamaldehyde (Cinnamon Smell)');
+            const loadMolecule = gui.addFolder('Load .mol file')
+            loadMolecule.add(loadMoleculeFile, 'loadFile').name('Load file from device');
+            loadMolecule.open();
 
+            const moleculeType = gui.addFolder('Examples')
+            moleculeType.add(showExampleMolecules, 'showCaffeine').name('Caffeine (Coffee, Chocolate, Tea)');
+            moleculeType.add(showExampleMolecules, 'showEthanol').name('Ethanol (Alcohol)');
+            moleculeType.add(showExampleMolecules, 'showCatnip').name('Nepetalactone (Catnip)');
+            moleculeType.add(showExampleMolecules, 'showCinnamon').name('Cinnamaldehyde (Cinnamon)');
+            moleculeType.open();
             
             const moleculePosition = gui.addFolder('Position')
             moleculePosition.add(moleculeGroup.position, 'x', -10, 10)

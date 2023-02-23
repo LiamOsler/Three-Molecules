@@ -617,7 +617,7 @@ scene.add( spotLight );
 The result will be something like this:
 ![Step-8](/screenshots/step-8.png)
 
-## Step 9: Add an axis helper:
+## Step 9: Add an axes helper:
 
 An axis helper is a useful tool built in to Three.js for visualizing orientation. We can add an axis helper to the scene by including the following line in the `init` function:
 
@@ -937,3 +937,6 @@ moleculeType.add(params, 'showEthanol').name('Ethanol (Alcohol)');
 moleculeType.add(params, 'showCatnip').name('Nepetalactone (Catnip)');
 moleculeType.add(params, 'showCinnamon').name('Cinnamaldehyde (Cinnamon Smell)');
 ```
+That will give us a set of buttons that will allow us to toggle between the different molecule types, like so:
+![Step-16](/screenshots/step-16.png)
+
