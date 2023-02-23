@@ -36,6 +36,31 @@ If you don't have Node.js installed, you can use the `python -m SimpleHTTPServer
 
 You can also use something like a [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for Visual Studio Code.
 
+### Table of Contents
+- [Three-Molecules](#three-molecules)
+  - [Getting Started](#getting-started)
+    - [Accessing the Individual Steps](#accessing-the-individual-steps)
+    - [Running a Web Server](#running-a-web-server)
+    - [Table of Contents](#table-of-contents)
+  - [Step 1: Import Three.js](#step-1-import-threejs)
+  - [Step 2: Create an init() function](#step-2-create-an-init-function)
+  - [Step 3: Load a mol file](#step-3-load-a-mol-file)
+  - [Step 4: Parsing a mol file](#step-4-parsing-a-mol-file)
+  - [Step 5: import the conversion function into the project:](#step-5-import-the-conversion-function-into-the-project)
+  - [Step 6: Clear the scene when the init function is called:](#step-6-clear-the-scene-when-the-init-function-is-called)
+  - [Step 7: Style the spheres:](#step-7-style-the-spheres)
+  - [Step 8: Add lighting:](#step-8-add-lighting)
+  - [Step 9: Add an axes helper:](#step-9-add-an-axes-helper)
+  - [Step 10: Center the molecule to the origin:](#step-10-center-the-molecule-to-the-origin)
+  - [Step 11: Convert to using ES6 modules:](#step-11-convert-to-using-es6-modules)
+  - [Step 12: Import OrbitControls:](#step-12-import-orbitcontrols)
+  - [Step 13: Add the molecule to a group, rather than the scene:](#step-13-add-the-molecule-to-a-group-rather-than-the-scene)
+  - [Step 14: Adding datgui and manipulating the molecule group:](#step-14-adding-datgui-and-manipulating-the-molecule-group)
+  - [Step 15: Adding auto-rotation:](#step-15-adding-auto-rotation)
+  - [Step 16: Adding buttons to toggle the molecule type in the menu:](#step-16-adding-buttons-to-toggle-the-molecule-type-in-the-menu)
+  - [Step 17: Loading a mol file from the device:](#step-17-loading-a-mol-file-from-the-device)
+
+
 ## Step 1: Import Three.js
 
 Start by setting up a basic file structure and importing version `r150` of the Three.js library. Note: you can also install the ES6 module version of Three.js using `npm install three` and this method is recommended for more complex projects. But for this simple example, we will use the minified version of the older version of the library.
@@ -940,3 +965,11 @@ moleculeType.add(params, 'showCinnamon').name('Cinnamaldehyde (Cinnamon Smell)')
 That will give us a set of buttons that will allow us to toggle between the different molecule types, like so:
 ![Step-16](/screenshots/step-16.png)
 
+## Step 17: Loading a mol file from the device:
+If we want to be able to load a mol file from the device, we can add a file input to the HTML file, and add an event listener to the file input. When the file input is changed, we can call the `drawMolecule()` function, passing in the mol file.
+```html
+<body>
+    <input id="fileInput" type="file"  accept=".mol" />
+    ...
+</body>
+```

@@ -158,6 +158,15 @@
 
 
         const moleculeFileInput = document.getElementById('fileInput');
+        moleculeFileInput.addEventListener('change', function(e) {
+            const file = moleculeFileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = reader.result;
+                drawMolecule(text);
+            };
+            reader.readAsText(file);
+        });
 
         const loadMoleculeFile = {
             loadFile : function() { 
@@ -175,8 +184,8 @@
             showCatnip : function() { 
                 getMolecule(141747);
             },
-            showCinnamon : function() { 
-                getMolecule(553117);
+            showThebacon : function() { 
+                getMolecule(9683173);
             }
         };
 
@@ -207,15 +216,15 @@
 
             const gui = new dat.GUI();
 
-            const loadMolecule = gui.addFolder('Load .mol file')
-            loadMolecule.add(loadMoleculeFile, 'loadFile').name('Load file from device');
+            const loadMolecule = gui.addFolder('Load')
+            loadMolecule.add(loadMoleculeFile, 'loadFile').name('Load .mol file from device');
             loadMolecule.open();
 
             const moleculeType = gui.addFolder('Examples')
             moleculeType.add(showExampleMolecules, 'showCaffeine').name('Caffeine (Coffee, Chocolate, Tea)');
             moleculeType.add(showExampleMolecules, 'showEthanol').name('Ethanol (Alcohol)');
             moleculeType.add(showExampleMolecules, 'showCatnip').name('Nepetalactone (Catnip)');
-            moleculeType.add(showExampleMolecules, 'showCinnamon').name('Cinnamaldehyde (Cinnamon)');
+            moleculeType.add(showExampleMolecules, 'showThebacon').name('Thebacon');
             moleculeType.open();
             
             const moleculePosition = gui.addFolder('Position')
