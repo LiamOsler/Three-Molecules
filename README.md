@@ -223,6 +223,9 @@ animate();
 
 When we call the `init()` function before the `animate()` function, the geometry is added to the scene and the camera positioned before the animation loop starts.
 
+With the code above working, you will see a green cube in the center of the browser window that looks something like this:
+![green cube](/screenshots/step-2.png)
+
 ## Step 3: Load a mol file
 
 Now that we have a basic scene set up, we can start to add some more complex objects to the scene. We will start by creating a function that fetches a mol file from the server, and then parses it to create a Three.js mesh.
@@ -532,4 +535,408 @@ You will now see a sphere for each atom in the molecule, positioned according to
 
 What you should see so far will look like this:
 ![Step-5](/screenshots/step-5.png)
+
+## Step 6: Clear the scene when the init function is called:
+
+We can clear the scene when the `init` function is called by adding the following lines to the start of the `init` function:
+
+```js
+while(scene.children.length > 0){ 
+    scene.remove(scene.children[0]); 
+}
+```
+
+This removes the spheres from the scene, so that when the `init` function is called again, the spheres are not drawn again. By changing the `CSID` variable to a different value, a different molecule can be drawn (so long as the  corresponding file is present in the `molecules` folder).
+
+## Step 7: Style the spheres:
+
+The various elements of the molecule can be styled by changing the values of the `geometry` and `material` variables. The `geometry` variable is used to define the shape of the sphere, and the `material` variable is used to define the color and shading of the sphere. The `geometry` variable is defined as follows:
+
+```js
+const sphere = new THREE.Mesh( geometry, material );
+```
+
+If we want to vary the size of the sphere, we can use an object to hold these values in a map, and then use the `atom.type` value to select the appropriate item.
+
+```js
+const moleculeGeometries = {
+    "C": new THREE.SphereGeometry( .8, 32, 32 ),
+    "H": new THREE.SphereGeometry( .3, 32, 32 ),
+    "O": new THREE.SphereGeometry( .5, 32, 32 ),
+    "N": new THREE.SphereGeometry( .6, 32, 32 ),
+    "S": new THREE.SphereGeometry( .8, 32, 32 ),
+    "P": new THREE.SphereGeometry( .9, 32, 32 ),
+    "F": new THREE.SphereGeometry( .4, 32, 32 ),
+    "Cl": new THREE.SphereGeometry( .5, 32, 32 ),
+    "Br": new THREE.SphereGeometry( .6, 32, 32 ),
+    "I": new THREE.SphereGeometry( .7, 32, 32 ),
+}
+const moleculeMaterials = {
+    "C": new THREE.MeshStandardMaterial( { color: 0x333333 } ),
+    "H": new THREE.MeshStandardMaterial( { color: 0xffffff } ),
+    "O": new THREE.MeshStandardMaterial( { color: 0xff0000 } ),
+    "N": new THREE.MeshStandardMaterial( { color: 0x0000ff } ),
+    "S": new THREE.MeshStandardMaterial( { color: 0xffff00 } ),
+    "P": new THREE.MeshStandardMaterial( { color: 0xff00ff } ),
+    "F": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+    "Cl": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+    "Br": new THREE.MeshStandardMaterial( { color: 0x00ff00 } ),
+}
+```
+
+And we then access these items in the `drawMolecule` function when we define the sphere:
+
+```js
+for(let item of molObject.atoms){
+    const sphere = new THREE.Mesh( moleculeGeometries[item.type], moleculeMaterials[item.type] );
+    ...
+}
+```
+## Step 8: Add lighting:
+
+See: https://threejs.org/docs/#api/en/lights/SpotLight
+
+We can add ambient and spotlighting in our scene by including the following lines in the `init` function:
+
+```js
+const spotLight = new THREE.SpotLight( 0xffffff );
+spotLight.position.set( 100, 1000, 100 );
+spotLight.map = new THREE.TextureLoader().load( url );
+
+spotLight.castShadow = true;
+
+spotLight.shadow.mapSize.width = 1024;
+spotLight.shadow.mapSize.height = 1024;
+
+spotLight.shadow.camera.near = 500;
+spotLight.shadow.camera.far = 4000;
+spotLight.shadow.camera.fov = 30;
+
+scene.add( spotLight );
+```
+The result will be something like this:
+![Step-8](/screenshots/step-8.png)
+
+## Step 9: Add an axes helper:
+
+An axis helper is a useful tool built in to Three.js for visualizing orientation. We can add an axis helper to the scene by including the following line in the `init` function:
+
+```js
+const axesHelper = new THREE.AxesHelper( 5 );
+scene.add( axesHelper );
+```
+
+With the axis helper in place, you should see something like this:
+![Step-9](/screenshots/step-9.png)
+
+This particular mol file of caffeine has been centered to the origin, which is useful if we consider that we will want to be able to rotate the molecule later on in the tutorial.
+
+In contrast, see what happens when we load a different molecule where the origin is not at the center of the molecule (in this case, Sodium Stearate):
+![Step-9-2](/screenshots/step-9-2.png)
+
+Therefore, we may want to center the molecule to the origin when we load it.
+
+## Step 10: Center the molecule to the origin:
+In order to center the molecule to the origin, we need to calculate the center of the molecule. To do this, we need to determine the minimum and maximum values for the x, y, and z coordinates. We can do this by iterating through the atoms in the molecule, and comparing the current value of the x, y, and z coordinates to the current minimum and maximum values. We can then use the midpoint of these values to center the molecule to the origin.
+
+First, we need to create a variable to hold the minimum and maximum values for the x, y, and z coordinates, and set these to an initial value using the first item in the atoms array.
+
+Doing this 
+
+```js
+//Get the first point in the molecule:  
+let firstPoint = new THREE.Vector3(
+    molObject.atoms[0].position.x, 
+    molObject.atoms[0].position.y, 
+    molObject.atoms[0].position.z);
+//Set the initial limits to the first point:
+let limits = {
+    x: {
+        min: firstPoint.x,
+        max: firstPoint.x
+    },
+    y: {
+        min: firstPoint.y,
+        max: firstPoint.y
+    },
+    z: {
+        min: firstPoint.z,
+        max: firstPoint.z
+    }
+}
+```
+
+Then, we need to iterate through the atoms in the molecule, and compare the current value of the x, y, and z coordinates to the current minimum and maximum values:
+
+```js
+for(let item of molObject.atoms){
+    let point = new THREE.Vector3(
+        item.position.x, 
+        item.position.y, 
+        item.position.z);
+
+    if(Number(point.x) < Number(limits.x.min)){
+        limits.x.min = point.x;
+    }
+    if(Number(point.x) > Number(limits.x.max)){
+        limits.x.max = point.x;
+    }
+    if(Number(point.y) < Number(limits.y.min)){
+        limits.y.min = point.y;
+    }
+    if(Number(point.y) > Number(limits.y.max)){
+        limits.y.max = point.y;
+    }
+    if(Number(point.z) < Number(limits.z.min)){
+        limits.z.min = point.z;
+    }
+    if(Number(point.z) > Number(limits.z.max)){
+        limits.z.max = point.z;
+    }
+}
+```
+
+Then, we can create a new variable to hold the midpoint of the x, y, and z coordinates:
+
+```js
+let moleculeCenter = new THREE.Vector3(
+    (Number((limits.x.min)) + Number(limits.x.max))/2,
+    (Number((limits.y.min)) + Number(limits.y.max))/2,
+    (Number((limits.z.min)) + Number(limits.z.max))/2);
+```
+
+Then, this can be used to center the molecule to the origin:
+
+```js
+sphere.position.x = item.position.x - moleculeCenter.x;
+sphere.position.y = item.position.y - moleculeCenter.y;
+sphere.position.z = item.position.z - moleculeCenter.z;
+```
+
+If we go back and load the Sodium Stearate molecule, we should see something like this:
+
+![Step-10](/screenshots/step-10.png)
+
+## Step 11: Convert to using ES6 modules:
+
+First, download `three.modules.js` file from the Three.js repository or install Three.js using npm:
+https://threejs.org/docs/#manual/en/introduction/Installation
+
+Next, remove the script tag for `three.js` from the `index.html` file:
+
+```diff
+<head>
+    <title>Three JS Molecules</title>
+-   <script src="js/three.min.js"></script> -->
+
+    <script src="js/molFileToJSON.js"></script>
+
+    <style>
+        body { margin: 0; }
+    </style> 
+</head>
+```
+And we then add `type="module"` to the script tag for `molFileToJSON.js`:
+
+```html
+<script type= "module" >
+</script>
+```
+
+Then, import the THREE module:
+
+```diff
+<script type= "module" >
++   import * as THREE from './js/three.module.js';
+</script>
+```
+
+This will allow us to use the ES6 module syntax in our `molFileToJSON.js` file.
+
+## Step 12: Import OrbitControls:
+
+OrbitControls is an addition to Three.js that allows us to rotate the camera around the scene. We can import OrbitControls by adding the following line to the `molFileToJSON.js` file. First, start by saving the `OrbitControls.js` file to the `./js/` folder, the continue by adding an import map to the head of the HTMl file:
+```
+<script type="importmap">
+    {
+        "imports": {
+            "three": "./js/three.module.js",
+            "OrbitControls": "./js/OrbitControls.js"
+        }
+    }
+</script>
+```
+Then, we can import OrbitControls by adding the following to our main script:
+
+```js
+import {OrbitControls} from './js/OrbitControls.js';
+```
+
+Then, in the global scope, we can create a new instance of OrbitControls, after the camera and render have been created:
+
+```diff
+    import * as THREE from './js/three.module.js';
++   import {OrbitControls} from './js/ OrbitControls.js';
+ 
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(    75, window.innerWidth / window.innerHeight,   0. 1, 1000 ); 
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.   innerHeight );
+    document.body.appendChild( renderer.   domElement ); 
+
++   const controls = new THREE.OrbitControls( camera, renderer.domElement );
+```
+
+Then, in the animation loop, we can call the `update()` method on the controls object:
+
+```js
+controls.update();
+```
+
+With everything in place, we should be able to rotate the camera around the scene by clicking and dragging the mouse. Dragging the mouse in combination with the shift or control key will allow us to pan the camera, and the scroll wheel will allow us to zoom in and out.
+
+Using OrbitControls should look a bit like this:
+![Step-12](/screenshots/step-12.gif)
+
+## Step 13: Add the molecule to a group, rather than the scene:
+Since we will be adding multiple molecules to the scene, we can add each molecule to a group, and then add the group to the scene. This will allow us to manipulate the group as a whole, rather than each individual molecule.
+
+Begin by creating a new group in the global scope:
+
+```js
+let moleculeGroup = new THREE.Group();
+
+function drawMolecule(molFile){
+    ...
+}
+```
+
+Then, instead of adding the sphere to the scene, we can add it to the group, and then add the group to the scene:
+
+```diff
+let moleculeGroup = new THREE.Group();
+
+function drawMolecule(molFile){
+    ...
+    for(let item of molObject.atoms){
+        const sphere = new THREE.Mesh( moleculeGeometries[item.type], moleculeMaterials[item.type] );
+        
+        sphere.position.x = item.position.x - moleculeCenter.x;
+        sphere.position.y = item.position.y - moleculeCenter.y;
+        sphere.position.z = item.position.z - moleculeCenter.z;
+        
+-       scene.add( sphere );
++       moleculeGroup.add( sphere );
+    }
++   scene.add( moleculeGroup );
+}
+```
+
+This will allow us to manipulate the group as a whole, rather than each individual molecule. This will be useful in the next step, when we add the ability to manipulate the molecule.
+
+## Step 14: Adding datgui and manipulating the molecule group:
+We can use datgui to add a user interface to our application. This will allow us to manipulate the molecule group, and see the changes in real time.
+
+To use datgui, download or install it using npm. To use it with the project, we can add the following to the head of the HTML file:
+
+```html
+<head>
+    ...
+    <script type="text/javascript" src="js/datgui/dat.gui.min.js"></script>
+    ...
+</head>
+```
+
+We can then add a new GUI in the init function:
+
+```diff
++   const gui = new dat.GUI();
+```
+
+Then, we can add a folder to the GUI, and add a slider to the folder:
+
+```js
+const moleculePosition = gui.addFolder('Position')
+moleculePosition.add(moleculeGroup.position, 'x', -10, 10)
+moleculePosition.add(moleculeGroup.position, 'y', -10, 10)
+moleculePosition.add(moleculeGroup.position, 'z', -10, 10)
+
+const moleculeRotation = gui.addFolder('Rotation')
+moleculeRotation.add(moleculeGroup.rotation, 'x', -Math.PI, Math.PI)
+moleculeRotation.add(moleculeGroup.rotation, 'y', -Math.PI, Math.PI)
+moleculeRotation.add(moleculeGroup.rotation, 'z', -Math.PI, Math.PI)
+
+const moleculeScale = gui.addFolder('Scale')
+const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 1.5).name("Scaling Factor")
+scaleX.onChange(function(value){
+moleculeGroup.scale.y = value;
+moleculeGroup.scale.z = value;
+})
+```
+
+This will give you a set of controls that will allow you to manipulate the molecule group. The controls should look something like this:
+![Step-14](/screenshots/step-14.png)
+
+## Step 15: Adding auto-rotation:
+
+We can add auto-rotation to the molecule group by adding a few things, firstly, a variable to keep track of whether or not auto-rotation is enabled:
+
+```js
+let autoRotate = {
+    switch: false
+}
+```
+
+Then, within the `init()` function, we can add a checkbox to the GUI, and add an event listener to the checkbox:
+
+```js
+gui.add(autoRotate, "switch").name("Auto Rotate");
+```
+
+Finally, we can add a check to the animation loop, to see if auto-rotation is enabled, and if so, rotate the molecule group:
+
+```js
+if(autoRotate.switch){
+    moleculeGroup.rotation.x-=.5*deltaTime;
+}
+```
+
+Then, we'll be able to toggle auto-rotation on and off, and see the molecule rotate in real time, like so:
+
+![Step-15](/screenshots/step-15.gif)
+
+## Step 16: Adding buttons to toggle the molecule type in the menu:
+
+We can add buttons to the menu, to toggle between the different molecule types. To do this, we can add a new function to the GUI object, that will be called when the button is clicked:
+
+```js
+var params = {
+    showCaffeine : function(CSID) { 
+        getMolecule(2424);
+    },
+    showEthanol : function(CSID) { 
+        getMolecule(682);
+    },
+    showCatnip : function(CSID) { 
+        getMolecule(141747);
+    },
+    showCinnamon : function(CSID) { 
+        getMolecule(553117);
+    }
+};
+```
+
+Then, we can add the buttons to the menu:
+
+```js
+const moleculeType = gui.addFolder('Example Molecules   ')
+moleculeType.add(params, 'showCaffeine').name('Caffeine (Coffee, Chocolate, Tea)');
+moleculeType.add(params, 'showEthanol').name('Ethanol (Alcohol)');
+moleculeType.add(params, 'showCatnip').name('Nepetalactone (Catnip)');
+moleculeType.add(params, 'showCinnamon').name('Cinnamaldehyde (Cinnamon Smell)');
+```
+That will give us a set of buttons that will allow us to toggle between the different molecule types, like so:
+![Step-16](/screenshots/step-16.png)
 
