@@ -59,6 +59,7 @@ You can also use something like a [Live Server](https://marketplace.visualstudio
   - [Step 15: Adding auto-rotation:](#step-15-adding-auto-rotation)
   - [Step 16: Adding buttons to toggle the molecule type in the menu:](#step-16-adding-buttons-to-toggle-the-molecule-type-in-the-menu)
   - [Step 17: Loading a mol file from the device:](#step-17-loading-a-mol-file-from-the-device)
+  - [Step 18: Adding a VR support with WebXR:](#step-18-adding-a-vr-support-with-webxr)
 
 
 ## Step 1: Import Three.js
@@ -972,4 +973,37 @@ If we want to be able to load a mol file from the device, we can add a file inpu
     <input id="fileInput" type="file"  accept=".mol" />
     ...
 </body>
+```
+
+Then, we can add an event listener to the file input, and call the `drawMolecule()` function, passing in the mol file:
+
+```js
+const moleculeFileInput = document.getElementById('fileInput');
+moleculeFileInput.addEventListener('change', function(e) {
+    const file = moleculeFileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = reader.result;
+        drawMolecule(text);
+    };
+    reader.readAsText(file);
+});
+
+const loadMoleculeFile = {
+    loadFile : function() { 
+        document.getElementById('fileInput').click();
+    },
+};
+```
+
+Now, by clicking the "Load file from device" button, we can load a mol file from the device, and see the molecule rendered in the scene.
+
+This allows the user to load any mol file from the device, and see the molecule rendered in the scene. This can be useful for testing, or for loading a molecule that is not shown in the menu.
+
+## Step 18: Adding a VR support with WebXR:
+
+We can add VR support to the application, by using the WebXR API. To do this, we can add a new function to the GUI object, that will be called when the button is clicked:
+
+```js
+
 ```
