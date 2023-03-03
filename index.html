@@ -47,6 +47,7 @@
             const clock = new THREE.Clock();
             let deltaTime = 0;
             let totalTime = 0;
+            let centerOffset = -10;
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -59,15 +60,6 @@
             const activateAR = document.body.appendChild( ARButton.createButton( renderer ) );
             renderer.xr.enabled = true;
 
-            let arToggled = false;
-            renderer.xr.addEventListener( 'sessionstart', function ( event ) {
-                if(arToggled == false){
-                    moleculeGroup.position.z = -30;
-                    arToggled = true;
-                }
-            } );
-            renderer.xr.addEventListener( 'sessionend', function ( event ) {
-            } );
             
             renderer.setAnimationLoop( function () {
                 renderer.render( scene, camera );
@@ -75,6 +67,8 @@
 
 
             const controls = new OrbitControls( camera, renderer.domElement );
+            controls.target.set( 0, 0, centerOffset );
+
             
             let autoRotateX = {
                 switch: false
@@ -110,6 +104,8 @@
                 "Br": new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
                 "I" : new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
             }
+            const cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+
 
             let moleculeGroup = new THREE.Group();
 
@@ -173,6 +169,36 @@
                     sphere.position.z = item.position.z - moleculeCenter.z;
                     moleculeGroup.add( sphere );
                 }
+                for(let bond of molObject.bonds){
+
+                    let index1 = Number(bond[0])-1;
+                    let index2 = Number(bond[1])-1;
+
+                    let atom1 = molObject.atoms[index1];
+                    let atom2 = molObject.atoms[index2];
+
+                    let point1 = new THREE.Vector3( atom1.position.x - moleculeCenter.x, atom1.position.y- moleculeCenter.y, atom1.position.z - moleculeCenter.z );
+                    let point2 = new THREE.Vector3( atom2.position.x - moleculeCenter.x, atom2.position.y- moleculeCenter.y, atom2.position.z - moleculeCenter.z );
+                    
+                    let distance = point1.distanceTo(point2);
+
+                    let cylinderRadius = bond[2] == 1 ? .05 : .15;
+
+                    const cylinderGeometry = new THREE.CylinderGeometry( cylinderRadius, cylinderRadius, distance, 8 );
+                    cylinderGeometry.translate(0, distance / 2, 0);
+                    cylinderGeometry.rotateX(Math.PI / 2);
+
+                    const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+                    cylinder.position.x = atom1.position.x - moleculeCenter.x;
+                    cylinder.position.y = atom1.position.y - moleculeCenter.y;
+                    cylinder.position.z = atom1.position.z - moleculeCenter.z;
+                    cylinder.lookAt(point2);
+
+                    moleculeGroup.add( cylinder );
+
+                    }
+
+                moleculeGroup.position.z = centerOffset;
 
                 scene.add( moleculeGroup );
             }
@@ -237,8 +263,7 @@
 
                 camera.position.x = 5;
                 camera.position.y = 5;
-                camera.position.z = 5;
-                camera.lookAt(0,0,0);
+                camera.position.z = centerOffset - 5;
 
                 // const axesHelper = new THREE.AxesHelper( 5 );
                 // scene.add( axesHelper );
@@ -300,7 +325,6 @@
             init(2424);
 
             animate();
-
 
         </script>
     </body>
