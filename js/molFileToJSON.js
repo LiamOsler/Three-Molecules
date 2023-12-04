@@ -35,7 +35,7 @@ const molFileToJSON = (molFile) => {
 
     const bondsArray = [];
     for (let i = 4+parseInt(molObj.counts.molecules); i < 4 +parseInt(molObj.counts.molecules)+ parseInt(molObj.counts.bonds); i++) {
-        const bond = [split[i].slice(0, 3).trim(), split[i].slice(3, 6).trim()];
+        const bond = [split[i].slice(0, 3).trim(), split[i].slice(3, 6).trim(), split[i].slice(6, 9).trim()];
         bondsArray.push(bond)
     }
     molObj.bonds = bondsArray;

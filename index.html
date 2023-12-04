@@ -1,271 +1,331 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Three JS Molecules</title>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "./js/three.module.js",
-                "OrbitControls": "./js/OrbitControls.js"
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Three JS Molecules</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "./js/three.module.js",
+                    "OrbitControls": "./js/OrbitControls.js"
+                }
             }
-        }
-    </script>
-    <script type="text/javascript" src="js/datgui/dat.gui.min.js"></script>
+        </script>
+        <script type="text/javascript" src="js/datgui/dat.gui.min.js"></script>
 
-    <script src="js/molFileToJSON.js"></script>
+        <script src="js/molFileToJSON.js"></script>
 
-    <style>
-        body { margin: 0; }
-        #fileInput {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 0%;
-            opacity: 0;
-            cursor: pointer;
-        }
-    </style> 
-</head>
-<body>
-    <input id="fileInput" type="file"  accept=".mol" />
-
-    <script type= "module">
-        import {OrbitControls} from './js/OrbitControls.js';
-        import * as THREE from './js/three.module.js';
-
-        const clock = new THREE.Clock();
-        let deltaTime = 0;
-        let totalTime = 0;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        document.body.appendChild( renderer.domElement );
-
-        const controls = new OrbitControls( camera, renderer.domElement );
-        
-        let autoRotateX = {
-            switch: false
-        }
-        let autoRotateY = {
-            switch: false
-        }
-        let autoRotateZ = {
-            switch: false
-        }
-
-        const moleculeGeometries = {
-            "C" : new THREE.SphereGeometry( .8, 32, 32 ),
-            "H" : new THREE.SphereGeometry( .3, 32, 32 ),
-            "O" : new THREE.SphereGeometry( .5, 32, 32 ),
-            "N" : new THREE.SphereGeometry( .6, 32, 32 ),
-            "S" : new THREE.SphereGeometry( .8, 32, 32 ),
-            "P" : new THREE.SphereGeometry( .9, 32, 32 ),
-            "F" : new THREE.SphereGeometry( .4, 32, 32 ),
-            "Cl": new THREE.SphereGeometry( .5, 32, 32 ),
-            "Br": new THREE.SphereGeometry( .6, 32, 32 ),
-            "I" : new THREE.SphereGeometry( .7, 32, 32 ),
-        }
-        const moleculeMaterials = {
-            "C" : new THREE.MeshPhongMaterial( { color: 0x333333, opacity: 0.9, transparent: true} ),
-            "H" : new THREE.MeshPhongMaterial( { color: 0xffffff, opacity: 0.9, transparent: true} ),
-            "O" : new THREE.MeshPhongMaterial( { color: 0xff0000, opacity: 0.9, transparent: true} ),
-            "N" : new THREE.MeshPhongMaterial( { color: 0x0000ff, opacity: 0.9, transparent: true} ),
-            "S" : new THREE.MeshPhongMaterial( { color: 0xffff00, opacity: 0.9, transparent: true} ),
-            "P" : new THREE.MeshPhongMaterial( { color: 0xff00ff, opacity: 0.9, transparent: true} ),
-            "F" : new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
-            "Cl": new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
-            "Br": new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
-            "I" : new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
-        }
-
-        let moleculeGroup = new THREE.Group();
-
-        function drawMolecule(molFile){
-            while(moleculeGroup.children.length > 0){ 
-                moleculeGroup.remove(moleculeGroup.children[0]); 
+        <style>
+            body { 
+                margin: 0; 
+                background-color: black;
             }
-            const molObject = molFileToJSON(molFile);
+            #fileInput {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 0%;
+                height: 0%;
+                opacity: 0;
+                cursor: pointer;
+            }
+        </style> 
+    </head>
+    <body>
+        <input id="fileInput" type="file"  accept=".mol" />
 
-            let firstPoint = new THREE.Vector3(
-                molObject.atoms[0].position.x, 
-                molObject.atoms[0].position.y, 
-                molObject.atoms[0].position.z);
+        <script type= "module">
+            import {OrbitControls} from './js/OrbitControls.js';
+            import { VRButton } from './js/VRButton.js';
+            import { ARButton } from './js/ARButton.js';
 
-            let limits = {
-                x: {
-                    min: firstPoint.x,
-                    max: firstPoint.x
+
+            import * as THREE from './js/three.module.js';
+            
+
+            const clock = new THREE.Clock();
+            let deltaTime = 0;
+            let totalTime = 0;
+            let centerOffset = -10;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setClearColor( 0x000000, 0 );
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            document.body.appendChild( renderer.domElement );
+
+            const activateAR = document.body.appendChild( ARButton.createButton( renderer ) );
+            renderer.xr.enabled = true;
+
+            
+            renderer.setAnimationLoop( function () {
+                renderer.render( scene, camera );
+            } );
+
+
+            const controls = new OrbitControls( camera, renderer.domElement );
+            controls.target.set( 0, 0, centerOffset );
+
+            
+            let autoRotateX = {
+                switch: false
+            }
+            let autoRotateY = {
+                switch: false
+            }
+            let autoRotateZ = {
+                switch: false
+            }
+
+            const moleculeGeometries = {
+                "C" : new THREE.SphereGeometry( .8, 32, 32 ),
+                "H" : new THREE.SphereGeometry( .3, 32, 32 ),
+                "O" : new THREE.SphereGeometry( .5, 32, 32 ),
+                "N" : new THREE.SphereGeometry( .6, 32, 32 ),
+                "S" : new THREE.SphereGeometry( .8, 32, 32 ),
+                "P" : new THREE.SphereGeometry( .9, 32, 32 ),
+                "F" : new THREE.SphereGeometry( .4, 32, 32 ),
+                "Cl": new THREE.SphereGeometry( .5, 32, 32 ),
+                "Br": new THREE.SphereGeometry( .6, 32, 32 ),
+                "I" : new THREE.SphereGeometry( .7, 32, 32 ),
+            }
+            const moleculeMaterials = {
+                "C" : new THREE.MeshPhongMaterial( { color: 0x333333, opacity: 0.9, transparent: true} ),
+                "H" : new THREE.MeshPhongMaterial( { color: 0xffffff, opacity: 0.9, transparent: true} ),
+                "O" : new THREE.MeshPhongMaterial( { color: 0xff0000, opacity: 0.9, transparent: true} ),
+                "N" : new THREE.MeshPhongMaterial( { color: 0x0000ff, opacity: 0.9, transparent: true} ),
+                "S" : new THREE.MeshPhongMaterial( { color: 0xffff00, opacity: 0.9, transparent: true} ),
+                "P" : new THREE.MeshPhongMaterial( { color: 0xff00ff, opacity: 0.9, transparent: true} ),
+                "F" : new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+                "Cl": new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+                "Br": new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+                "I" : new THREE.MeshPhongMaterial( { color: 0x00ff00, opacity: 0.9, transparent: true} ),
+            }
+            const cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+
+
+            let moleculeGroup = new THREE.Group();
+
+            function drawMolecule(molFile){
+                while(moleculeGroup.children.length > 0){ 
+                    moleculeGroup.remove(moleculeGroup.children[0]); 
+                }
+                const molObject = molFileToJSON(molFile);
+
+                let firstPoint = new THREE.Vector3(
+                    molObject.atoms[0].position.x, 
+                    molObject.atoms[0].position.y, 
+                    molObject.atoms[0].position.z);
+
+                let limits = {
+                    x: {
+                        min: firstPoint.x,
+                        max: firstPoint.x
+                    },
+                    y: {
+                        min: firstPoint.y,
+                        max: firstPoint.y
+                    },
+                    z: {
+                        min: firstPoint.z,
+                        max: firstPoint.z
+                    }
+                }
+
+                for(let item of molObject.atoms){
+                    let point = new THREE.Vector3(item.position.x, item.position.y, item.position.z);
+                    if(Number(point.x) < Number(limits.x.min)){
+                        limits.x.min = point.x;
+                    }
+                    if(Number(point.x) > Number(limits.x.max)){
+                        limits.x.max = point.x;
+                    }
+                    if(Number(point.y) < Number(limits.y.min)){
+                        limits.y.min = point.y;
+                    }
+                    if(Number(point.y) > Number(limits.y.max)){
+                        limits.y.max = point.y;
+                    }
+                    if(Number(point.z) < Number(limits.z.min)){
+                        limits.z.min = point.z;
+                    }
+                    if(Number(point.z) > Number(limits.z.max))  {
+                        limits.z.max = point.z;
+                    }
+                }
+
+                let moleculeCenter = new THREE.Vector3(
+                    (Number((limits.x.min)) + Number(limits.x.max))/2,
+                    (Number((limits.y.min)) + Number(limits.y.max))/2,
+                    (Number((limits.z.min)) + Number(limits.z.max))/2);
+                            
+                for(let item of molObject.atoms){
+                    const sphere = new THREE.Mesh( moleculeGeometries[item.type], moleculeMaterials[item.type] );
+                    sphere.position.x = item.position.x - moleculeCenter.x;
+                    sphere.position.y = item.position.y - moleculeCenter.y;
+                    sphere.position.z = item.position.z - moleculeCenter.z;
+                    moleculeGroup.add( sphere );
+                }
+                for(let bond of molObject.bonds){
+
+                    let index1 = Number(bond[0])-1;
+                    let index2 = Number(bond[1])-1;
+
+                    let atom1 = molObject.atoms[index1];
+                    let atom2 = molObject.atoms[index2];
+
+                    let point1 = new THREE.Vector3( atom1.position.x - moleculeCenter.x, atom1.position.y- moleculeCenter.y, atom1.position.z - moleculeCenter.z );
+                    let point2 = new THREE.Vector3( atom2.position.x - moleculeCenter.x, atom2.position.y- moleculeCenter.y, atom2.position.z - moleculeCenter.z );
+                    
+                    let distance = point1.distanceTo(point2);
+
+                    let cylinderRadius = bond[2] == 1 ? .05 : .15;
+
+                    const cylinderGeometry = new THREE.CylinderGeometry( cylinderRadius, cylinderRadius, distance, 8 );
+                    cylinderGeometry.translate(0, distance / 2, 0);
+                    cylinderGeometry.rotateX(Math.PI / 2);
+
+                    const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+                    cylinder.position.x = atom1.position.x - moleculeCenter.x;
+                    cylinder.position.y = atom1.position.y - moleculeCenter.y;
+                    cylinder.position.z = atom1.position.z - moleculeCenter.z;
+                    cylinder.lookAt(point2);
+
+                    moleculeGroup.add( cylinder );
+
+                    }
+
+                moleculeGroup.position.z = centerOffset;
+
+                scene.add( moleculeGroup );
+            }
+
+            export function getMolecule(CSID){
+                fetch('molecules/' + CSID + '.mol')
+                    .then(response => response.text())
+                    .then(molFile => {
+                        drawMolecule(molFile);
+                    });
+                }
+
+
+            const moleculeFileInput = document.getElementById('fileInput');
+            moleculeFileInput.addEventListener('change', function(e) {
+                const file = moleculeFileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const text = reader.result;
+                    drawMolecule(text);
+                };
+                reader.readAsText(file);
+            });
+
+            const loadMoleculeFile = {
+                loadFile : function() { 
+                    document.getElementById('fileInput').click();
                 },
-                y: {
-                    min: firstPoint.y,
-                    max: firstPoint.y
+            };
+
+            const showExampleMolecules = {
+                showCaffeine : function() { 
+                    getMolecule(2424);
                 },
-                z: {
-                    min: firstPoint.z,
-                    max: firstPoint.z
+                showEthanol : function() { 
+                    getMolecule(682);
+                },
+                showCatnip : function() { 
+                    getMolecule(141747);
+                },
+                showThebacon : function() { 
+                    getMolecule(9683173);
                 }
+            };
+
+            function init(defaultCSID){
+
+                getMolecule(defaultCSID);
+
+                const spotLight = new THREE.SpotLight( 0xffffff );
+                spotLight.position.set( 100, 1000, 100 );
+                spotLight.castShadow = true;
+                spotLight.shadow.mapSize.width = 1024;
+                spotLight.shadow.mapSize.height = 1024;
+                spotLight.shadow.camera.near = 500;
+                spotLight.shadow.camera.far = 4000;
+                spotLight.shadow.camera.fov = 30;
+                scene.add( spotLight );
+
+                const light = new THREE.AmbientLight( 0xffffff ); // soft white light
+                scene.add( light );
+
+                camera.position.x = 5;
+                camera.position.y = 5;
+                camera.position.z = centerOffset - 5;
+
+                // const axesHelper = new THREE.AxesHelper( 5 );
+                // scene.add( axesHelper );
+
+                const gui = new dat.GUI();
+
+                const loadMolecule = gui.addFolder('Load')
+                loadMolecule.add(loadMoleculeFile, 'loadFile').name('Load .mol file from device');
+                loadMolecule.open();
+
+                const moleculeType = gui.addFolder('Examples')
+                moleculeType.add(showExampleMolecules, 'showCaffeine').name('Caffeine (Coffee, Chocolate, Tea)');
+                moleculeType.add(showExampleMolecules, 'showEthanol').name('Ethanol (Alcohol)');
+                moleculeType.add(showExampleMolecules, 'showCatnip').name('Nepetalactone (Catnip)');
+                moleculeType.add(showExampleMolecules, 'showThebacon').name('Thebacon');
+                moleculeType.open();
+                
+                const moleculePosition = gui.addFolder('Position')
+                moleculePosition.add(moleculeGroup.position, 'x', -10, 10)
+                moleculePosition.add(moleculeGroup.position, 'y', -10, 10)
+                moleculePosition.add(moleculeGroup.position, 'z', -10, 10)
+
+                const moleculeRotation = gui.addFolder('Rotation')
+                moleculeRotation.add(moleculeGroup.rotation, 'x', -Math.PI, Math.PI)
+                moleculeRotation.add(moleculeGroup.rotation, 'y', -Math.PI, Math.PI)
+                moleculeRotation.add(moleculeGroup.rotation, 'z', -Math.PI, Math.PI)
+                moleculeRotation.add(autoRotateX, "switch").name("Auto Rotate X");
+                moleculeRotation.add(autoRotateY, "switch").name("Auto Rotate Y");
+                moleculeRotation.add(autoRotateZ, "switch").name("Auto Rotate Z");
+                
+                const moleculeScale = gui.addFolder('Scale')
+                const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 1.5).name("Scaling Factor")
+                scaleX.onChange(function(value){
+                    moleculeGroup.scale.y = value;
+                    moleculeGroup.scale.z = value;
+                })
             }
-
-            for(let item of molObject.atoms){
-                let point = new THREE.Vector3(item.position.x, item.position.y, item.position.z);
-                if(Number(point.x) < Number(limits.x.min)){
-                    limits.x.min = point.x;
-                }
-                if(Number(point.x) > Number(limits.x.max)){
-                    limits.x.max = point.x;
-                }
-                if(Number(point.y) < Number(limits.y.min)){
-                    limits.y.min = point.y;
-                }
-                if(Number(point.y) > Number(limits.y.max)){
-                    limits.y.max = point.y;
-                }
-                if(Number(point.z) < Number(limits.z.min)){
-                    limits.z.min = point.z;
-                }
-                if(Number(point.z) > Number(limits.z.max))  {
-                    limits.z.max = point.z;
-                }
-            }
-
-            let moleculeCenter = new THREE.Vector3(
-                (Number((limits.x.min)) + Number(limits.x.max))/2,
-                (Number((limits.y.min)) + Number(limits.y.max))/2,
-                (Number((limits.z.min)) + Number(limits.z.max))/2);
-                        
-            for(let item of molObject.atoms){
-                const sphere = new THREE.Mesh( moleculeGeometries[item.type], moleculeMaterials[item.type] );
-                sphere.position.x = item.position.x - moleculeCenter.x;
-                sphere.position.y = item.position.y - moleculeCenter.y;
-                sphere.position.z = item.position.z - moleculeCenter.z;
-                moleculeGroup.add( sphere );
-            }
-
-            scene.add( moleculeGroup );
-        }
-
-        export function getMolecule(CSID){
-            fetch('molecules/' + CSID + '.mol')
-                .then(response => response.text())
-                .then(molFile => {
-                    drawMolecule(molFile);
-                });
-        }
-
-
-        const moleculeFileInput = document.getElementById('fileInput');
-
-        const loadMoleculeFile = {
-            loadFile : function() { 
-                document.getElementById('fileInput').click();
-            },
-        };
-
-        const showExampleMolecules = {
-            showCaffeine : function() { 
-                getMolecule(2424);
-            },
-            showEthanol : function() { 
-                getMolecule(682);
-            },
-            showCatnip : function() { 
-                getMolecule(141747);
-            },
-            showCinnamon : function() { 
-                getMolecule(553117);
-            }
-        };
-
-        function init(defaultCSID){
-
-            getMolecule(defaultCSID);
-
-            const spotLight = new THREE.SpotLight( 0xffffff );
-            spotLight.position.set( 100, 1000, 100 );
-            spotLight.castShadow = true;
-            spotLight.shadow.mapSize.width = 1024;
-            spotLight.shadow.mapSize.height = 1024;
-            spotLight.shadow.camera.near = 500;
-            spotLight.shadow.camera.far = 4000;
-            spotLight.shadow.camera.fov = 30;
-            scene.add( spotLight );
-
-            const light = new THREE.AmbientLight( 0xffffff ); // soft white light
-            scene.add( light );
-
-            camera.position.x = 5;
-            camera.position.y = 5;
-            camera.position.z = 5;
-            camera.lookAt(0,0,0);
-
-            // const axesHelper = new THREE.AxesHelper( 5 );
-            // scene.add( axesHelper );
-
-            const gui = new dat.GUI();
-
-            const loadMolecule = gui.addFolder('Load .mol file')
-            loadMolecule.add(loadMoleculeFile, 'loadFile').name('Load file from device');
-            loadMolecule.open();
-
-            const moleculeType = gui.addFolder('Examples')
-            moleculeType.add(showExampleMolecules, 'showCaffeine').name('Caffeine (Coffee, Chocolate, Tea)');
-            moleculeType.add(showExampleMolecules, 'showEthanol').name('Ethanol (Alcohol)');
-            moleculeType.add(showExampleMolecules, 'showCatnip').name('Nepetalactone (Catnip)');
-            moleculeType.add(showExampleMolecules, 'showCinnamon').name('Cinnamaldehyde (Cinnamon)');
-            moleculeType.open();
             
-            const moleculePosition = gui.addFolder('Position')
-            moleculePosition.add(moleculeGroup.position, 'x', -10, 10)
-            moleculePosition.add(moleculeGroup.position, 'y', -10, 10)
-            moleculePosition.add(moleculeGroup.position, 'z', -10, 10)
+            function animate() {
+                requestAnimationFrame( animate );
+                renderer.render( scene, camera );
+                
+                deltaTime = clock.getDelta();
+                totalTime += deltaTime;
 
-            const moleculeRotation = gui.addFolder('Rotation')
-            moleculeRotation.add(moleculeGroup.rotation, 'x', -Math.PI, Math.PI)
-            moleculeRotation.add(moleculeGroup.rotation, 'y', -Math.PI, Math.PI)
-            moleculeRotation.add(moleculeGroup.rotation, 'z', -Math.PI, Math.PI)
-            moleculeRotation.add(autoRotateX, "switch").name("Auto Rotate X");
-            moleculeRotation.add(autoRotateY, "switch").name("Auto Rotate Y");
-            moleculeRotation.add(autoRotateZ, "switch").name("Auto Rotate Z");
+                if(autoRotateX.switch){
+                    moleculeGroup.rotation.x-=.5*deltaTime;
+                }
+                if(autoRotateY.switch){
+                    moleculeGroup.rotation.y-=.5*deltaTime;
+                }
+                if(autoRotateZ.switch){
+                    moleculeGroup.rotation.z-=.5*deltaTime;
+                }
+
+                controls.update();
+            }
             
-            const moleculeScale = gui.addFolder('Scale')
-            const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 1.5).name("Scaling Factor")
-            scaleX.onChange(function(value){
-                moleculeGroup.scale.y = value;
-                moleculeGroup.scale.z = value;
-            })
+            init(2424);
 
-        }
-        
-        function animate() {
-            requestAnimationFrame( animate );
-            renderer.render( scene, camera );
-            
-            deltaTime = clock.getDelta();
-            totalTime += deltaTime;
+            animate();
 
-            if(autoRotateX.switch){
-                moleculeGroup.rotation.x-=.5*deltaTime;
-            }
-            if(autoRotateY.switch){
-                moleculeGroup.rotation.y-=.5*deltaTime;
-            }
-            if(autoRotateZ.switch){
-                moleculeGroup.rotation.z-=.5*deltaTime;
-            }
-
-            controls.update();
-        }
-        
-        init(2424);
-
-        animate();
-
-        window.getMolecule = getMolecule;
-
-    </script>
-</body>
-</html>
+        </script>
+    </body>
+    </html>
